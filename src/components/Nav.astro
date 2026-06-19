@@ -1,0 +1,22 @@
+---
+import { company, nav } from "../data/site";
+---
+<div class="utility"><div class="wrap">
+  <div class="u-l mono">
+    <span>{company.rc}</span>
+    <span>{company.location}</span>
+  </div>
+  <a class="mono" href={`mailto:${company.email}`}>{company.email}</a>
+</div></div>
+
+<header class="nav" id="nav"><div class="wrap">
+  <a href="#home" class="brand">
+    <span class="mark">I</span>
+    <span><b>{company.short}</b><small>International Ltd</small></span>
+  </a>
+  <nav class="menu" id="menu"><ul>
+    {nav.map((item) => <li><a href={item.href}>{item.label}</a></li>)}
+    <li><a class="nav-cta" href="#contact">Start a project</a></li>
+  </ul></nav>
+  <button class="burger" id="burger" aria-label="Menu"><span></span><span></span><span></span></button>
+</div></header>

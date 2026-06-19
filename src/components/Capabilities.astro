@@ -1,0 +1,25 @@
+---
+import { services } from "../data/site";
+---
+<section class="cap" id="what">
+  <div class="cap-intro"><div class="wrap"><div class="row">
+    <div>
+      <span class="eyebrow on-dark" data-reveal>What we do</span>
+      <h2 data-reveal>Eight domains. One coordinated team.</h2>
+    </div>
+    <div class="cap-progress" aria-hidden="true"><i id="capBar"></i></div>
+  </div></div></div>
+
+  <div class="h-outer"><div class="h-track" id="hTrack">
+    <div class="pad"></div>
+    {services.map((s) => (
+      <article class="cap-card">
+        <span class="idx">{s.idx} / {s.cat}</span>
+        <h3 set:html={s.title} />
+        <p>{s.desc}</p>
+        <div class="tags">{s.tags.map((t) => <span>{t}</span>)}</div>
+      </article>
+    ))}
+    <div class="pad"></div>
+  </div></div>
+</section>

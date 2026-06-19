@@ -1,0 +1,32 @@
+---
+import { objectives, leaders } from "../data/site";
+const pad = (n: number) => String(n + 1).padStart(2, "0");
+---
+<section class="about" id="about">
+  <div class="glow" aria-hidden="true"></div>
+  <div class="wrap"><div class="grid">
+    <div>
+      <span class="eyebrow on-dark" data-reveal>The company</span>
+      <h2 data-reveal>A focused, modern partner built for what's next.</h2>
+      <p data-reveal>Incorporated in the Federal Republic of Nigeria, ISRION International Ltd delivers high-quality professional services that meet international standards and contribute to economic development, environmental protection and long-term sustainability.</p>
+      <ul class="obj">
+        {objectives.map((o, i) => <li data-n={pad(i)} data-reveal>{o}</li>)}
+      </ul>
+    </div>
+    <div>
+      <span class="eyebrow on-dark" data-reveal>Leadership</span>
+      <div class="leaders" style="margin-top:1.4rem">
+        {leaders.map((l) => (
+          <div class="leader" data-reveal>
+            <div class="av">{l.initials}</div>
+            <div>
+              <h4>{l.name}</h4>
+              <div class="role">{l.role}</div>
+              <p>{l.bio}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div></div>
+</section>
