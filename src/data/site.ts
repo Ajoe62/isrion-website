@@ -18,7 +18,7 @@ export const company = {
   // Formspree form ID — powers the contact form on any static host (Vercel etc).
   // Create a free form at https://formspree.io and paste the ID from the
   // endpoint it gives you (https://formspree.io/f/XXXXXXXX → use "XXXXXXXX").
-  formspreeId: "YOUR_FORM_ID",
+  formspreeId: "xojzgypn",
 };
 
 export const nav = [
