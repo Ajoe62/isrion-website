@@ -15,6 +15,10 @@ export const company = {
   // Used for SEO + sitemap. Change to your real domain once registered.
   url: "https://www.isrion.com",
   coords: "09.04°N · 07.36°E — Abuja, Nigeria",
+  // Formspree form ID — powers the contact form on any static host (Vercel etc).
+  // Create a free form at https://formspree.io and paste the ID from the
+  // endpoint it gives you (https://formspree.io/f/XXXXXXXX → use "XXXXXXXX").
+  formspreeId: "YOUR_FORM_ID",
 };
 
 export const nav = [
