@@ -7,7 +7,7 @@
   --navy-950:#001129; --navy-900:#001f4d; --navy:#00337d;
   --blue:#0b5cc4; --azure:#4f9bff; --azure-soft:#9cc4ff;
   --green:#1f9d57; --green-bright:#3ecb7c;
-  --paper:#ffffff; --mist:#f3f6fc; --ink:#0c1a2b; --muted:#5b6b7c;
+  --paper:#ffffff; --mist:#f3f6fc; --tint:#e7effb; --ink:#0c1a2b; --muted:#5b6b7c;
   --line:rgba(0,51,125,.14); --line-dark:rgba(255,255,255,.14);
   --shadow:0 30px 70px -40px rgba(0,28,77,.55);
   --r:16px;
@@ -274,7 +274,7 @@ nav.menu a[aria-current="page"]::after{width:100%}
 .arrow-link.on-dark:hover{color:#fff}
 
 /* ---- Home: who we are ---- */
-.home-intro{padding:var(--pad) 0;background:var(--paper)}
+.home-intro{padding:var(--pad) 0;background:var(--tint)}
 .home-intro .grid{display:grid;grid-template-columns:1fr 1.15fr;gap:clamp(2rem,6vw,5rem);align-items:start}
 .home-intro h2{font-size:clamp(1.9rem,1.4rem + 2.4vw,3.2rem);font-weight:500;max-width:18ch;margin:1.2rem 0 1.6rem}
 .home-intro h2 .hl{color:var(--green)}
@@ -292,7 +292,7 @@ nav.menu a[aria-current="page"]::after{width:100%}
 
 /* ---- Projects cards (home teaser + projects page) ---- */
 .home-projects{padding:var(--pad) 0;background:var(--mist)}
-.projects-list{padding:var(--pad) 0;background:var(--paper)}
+.projects-list{padding:var(--pad) 0;background:var(--tint)}
 .proj-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.6rem}
 .proj-card{display:flex;flex-direction:column;background:#fff;border:1px solid var(--line);border-radius:var(--r);
   overflow:hidden;padding-bottom:1.6rem;transition:border-color .3s,transform .35s var(--bezier),box-shadow .35s}
@@ -328,7 +328,7 @@ nav.menu a[aria-current="page"]::after{width:100%}
 .home-cta .btn-primary:hover{background:var(--mist)}
 
 /* ---- About: prose blocks, stats, values ---- */
-.prose{padding:var(--pad) 0;background:var(--paper)}
+.prose{padding:var(--pad) 0;background:var(--tint)}
 .prose.alt{background:var(--mist)}
 .prose .grid{display:grid;grid-template-columns:1fr 1.15fr;gap:clamp(2rem,6vw,5rem);align-items:start}
 .prose h2{font-size:clamp(1.9rem,1.4rem + 2.4vw,3.2rem);font-weight:500;max-width:18ch;margin-top:1.2rem}
@@ -340,17 +340,17 @@ nav.menu a[aria-current="page"]::after{width:100%}
 .stats-band .wrap{display:grid;grid-template-columns:repeat(4,1fr);gap:2rem}
 .stats-band .stat .n{font-family:"Space Grotesk";font-size:clamp(2rem,1.5rem + 1.5vw,2.8rem);font-weight:600;color:#fff;display:block;line-height:1}
 .stats-band .stat .l{font-family:"Space Mono",monospace;font-size:.66rem;letter-spacing:.18em;text-transform:uppercase;color:var(--azure-soft);margin-top:.6rem;display:block}
-.values-section{padding:var(--pad) 0;background:var(--paper)}
+.values-section{padding:var(--pad) 0;background:var(--tint)}
 .values-section h2{font-size:clamp(1.9rem,1.4rem + 2.4vw,3.2rem);font-weight:500;margin:1.2rem 0 2.4rem}
 .values-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.4rem}
-.value-card{background:var(--mist);border:1px solid var(--line);border-radius:var(--r);padding:1.8rem 1.6rem}
+.value-card{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:1.8rem 1.6rem}
 .value-card h4{font-family:"Space Grotesk";font-size:1.1rem;color:var(--navy);display:flex;align-items:center;gap:.6rem}
 .value-card h4::before{content:"";width:8px;height:8px;border-radius:2px;background:var(--green);flex:none}
 .value-card p{font-size:.92rem;color:var(--muted);margin-top:.6rem}
 .leaders.cols{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
 
 /* ---- Services page: detailed rows ---- */
-.services-list{padding:var(--pad) 0;background:var(--paper)}
+.services-list{padding:var(--pad) 0;background:var(--tint)}
 .svc-rows{display:grid;gap:1.2rem}
 .svc-row{position:relative;overflow:hidden;display:grid;grid-template-columns:200px 1fr;gap:2rem;padding:2rem 2rem 2rem 2.4rem;
   border:1px solid var(--line);border-radius:var(--r);background:#fff;
