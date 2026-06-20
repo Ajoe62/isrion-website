@@ -71,6 +71,7 @@ function heroVideo() {
 
 function heroSequence() {
   if (reduced()) return; // reduced-motion CSS already reveals everything
+  if (!document.querySelector(".hero [data-mask]")) return; // home-only video hero
   const tl = gsap.timeline({ defaults: { ease: "power3.out" }, delay: 0.15 });
   tl.to(".hero [data-mask] > *", { y: 0, duration: 1.05, stagger: 0.12 })
     .from(".hero .eyebrow", { opacity: 0, y: 14, duration: 0.6 }, 0)

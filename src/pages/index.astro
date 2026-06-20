@@ -1,23 +1,80 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import Nav from "../components/Nav.astro";
 import Hero from "../components/Hero.astro";
-import Statement from "../components/Statement.astro";
-import Capabilities from "../components/Capabilities.astro";
-import Approach from "../components/Approach.astro";
-import Industries from "../components/Industries.astro";
-import About from "../components/About.astro";
-import CTA from "../components/CTA.astro";
-import Footer from "../components/Footer.astro";
+import { values, services, projects } from "../data/site";
+
+const topServices = services.slice(0, 6);
+const featured = projects.slice(0, 3);
 ---
 <BaseLayout>
-  <Nav />
   <Hero />
-  <Statement />
-  <Capabilities />
-  <Approach />
-  <Industries />
-  <About />
-  <CTA />
-  <Footer />
+
+  <!-- WHO WE ARE — teaser → /about -->
+  <section class="home-intro"><div class="wrap"><div class="grid">
+    <div>
+      <span class="eyebrow" data-reveal>Who we are</span>
+      <h2 data-reveal>Integrated answers to <span class="hl">interconnected</span> challenges.</h2>
+      <a href="/about" class="arrow-link" data-reveal>More about us
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    </div>
+    <div class="body">
+      <p data-reveal>ISRION International Ltd combines technical expertise, advanced technologies and industry best practice to help governments, industries, development agencies and communities grow sustainably — without trading off environmental responsibility or operational efficiency.</p>
+      <div class="values">
+        {values.map((v) => (
+          <div class="value" data-reveal><h4>{v.title}</h4><p>{v.body}</p></div>
+        ))}
+      </div>
+    </div>
+  </div></div></section>
+
+  <!-- SERVICES — teaser → /services -->
+  <section class="home-services"><div class="wrap">
+    <div class="sec-head">
+      <div>
+        <span class="eyebrow on-dark" data-reveal>What we do</span>
+        <h2 data-reveal>Eight domains. One coordinated team.</h2>
+      </div>
+      <a href="/services" class="arrow-link on-dark" data-reveal>View all services
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    </div>
+    <div class="svc-grid">
+      {topServices.map((s) => (
+        <a class="svc-card" href="/services" data-reveal>
+          <span class="idx">{s.idx} / {s.cat}</span>
+          <h3 set:html={s.title} />
+          <p>{s.desc}</p>
+        </a>
+      ))}
+    </div>
+  </div></section>
+
+  <!-- PROJECTS — teaser → /projects -->
+  <section class="home-projects"><div class="wrap">
+    <div class="sec-head">
+      <div>
+        <span class="eyebrow" data-reveal>Our works</span>
+        <h2 data-reveal>Selected projects.</h2>
+      </div>
+      <a href="/projects" class="arrow-link" data-reveal>See all works
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    </div>
+    <div class="proj-grid">
+      {featured.map((p) => (
+        <a class="proj-card" href="/projects" data-reveal>
+          <div class="thumb" data-sector={p.sector}><span>{p.sector}</span></div>
+          <div class="meta"><span>{p.year}</span><span>{p.location}</span></div>
+          <h3>{p.title}</h3>
+          <p>{p.summary}</p>
+        </a>
+      ))}
+    </div>
+  </div></section>
+
+  <!-- CTA strip → /contact -->
+  <section class="home-cta"><div class="wrap">
+    <h2 data-reveal>Ready to deliver sustainable results together?</h2>
+    <p data-reveal>Tell us about your project — our team responds with technical depth and global standards.</p>
+    <a href="/contact" class="btn btn-primary" data-reveal>Start a project
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+  </div></section>
 </BaseLayout>

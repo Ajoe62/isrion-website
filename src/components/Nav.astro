@@ -1,5 +1,10 @@
 ---
 import { company, nav } from "../data/site";
+// Active-link detection. Home matches "/" exactly; others match by prefix
+// so e.g. /services and any future /services/* both highlight "Services".
+const path = Astro.url.pathname.replace(/\/$/, "") || "/";
+const isActive = (href: string) =>
+  href === "/" ? path === "/" : path === href || path.startsWith(href + "/");
 ---
 <div class="utility"><div class="wrap">
   <div class="u-l mono">
@@ -10,13 +15,15 @@ import { company, nav } from "../data/site";
 </div></div>
 
 <header class="nav" id="nav"><div class="wrap">
-  <a href="#home" class="brand">
+  <a href="/" class="brand">
     <span class="mark">I</span>
     <span><b>{company.short}</b><small>International Ltd</small></span>
   </a>
   <nav class="menu" id="menu"><ul>
-    {nav.map((item) => <li><a href={item.href}>{item.label}</a></li>)}
-    <li><a class="nav-cta" href="#contact">Start a project</a></li>
+    {nav.map((item) => (
+      <li><a href={item.href} aria-current={isActive(item.href) ? "page" : undefined}>{item.label}</a></li>
+    ))}
+    <li><a class="nav-cta" href="/contact" aria-current={isActive("/contact") ? "page" : undefined}>Contact Us</a></li>
   </ul></nav>
   <button class="burger" id="burger" aria-label="Menu"><span></span><span></span><span></span></button>
 </div></header>

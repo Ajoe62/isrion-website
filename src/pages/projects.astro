@@ -1,0 +1,37 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageHero from "../components/PageHero.astro";
+import { company, projects } from "../data/site";
+---
+<BaseLayout title={`Our Works — ${company.name}`}>
+  <PageHero
+    current="Our Works"
+    eyebrow="Projects"
+    title="Work that holds up over the long term."
+    subtitle="A selection of engagements across environmental, geospatial, energy and engineering domains. Representative examples — get in touch for sector-specific references."
+  />
+
+  <section class="projects-list"><div class="wrap">
+    <div class="proj-grid wide">
+      {projects.map((p) => (
+        <article class="proj-card" data-reveal>
+          {p.image
+            ? <img class="thumb" src={p.image} alt={p.title} loading="lazy" />
+            : <div class="thumb" data-sector={p.sector}><span>{p.sector}</span></div>}
+          <div class="meta"><span>{p.year}</span><span>{p.location}</span></div>
+          <h3>{p.title}</h3>
+          <p>{p.summary}</p>
+          <div class="tags">{p.tags.map((t) => <span>{t}</span>)}</div>
+        </article>
+      ))}
+    </div>
+  </div></section>
+
+  <!-- CTA -->
+  <section class="home-cta"><div class="wrap">
+    <h2 data-reveal>Want to discuss a similar project?</h2>
+    <p data-reveal>We'll share relevant experience and outline how we'd approach your work.</p>
+    <a href="/contact" class="btn btn-primary" data-reveal>Contact us
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+  </div></section>
+</BaseLayout>

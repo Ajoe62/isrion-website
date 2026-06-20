@@ -1,0 +1,87 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageHero from "../components/PageHero.astro";
+import { company, values, objectives, leaders } from "../data/site";
+const pad = (n: number) => String(n + 1).padStart(2, "0");
+---
+<BaseLayout title={`About Us — ${company.name}`}>
+  <PageHero
+    current="About Us"
+    eyebrow="The company"
+    title="A focused, modern partner built for what's next."
+    subtitle="A multidisciplinary consulting, technology, engineering and sustainability firm turning environmental, geospatial and energy challenges into data-driven, buildable outcomes."
+  />
+
+  <!-- WHO WE ARE -->
+  <section class="prose"><div class="wrap"><div class="grid">
+    <div>
+      <span class="eyebrow" data-reveal>Who we are</span>
+      <h2 data-reveal>Integrated answers to <span class="hl">interconnected</span> challenges.</h2>
+    </div>
+    <div class="body">
+      <p data-reveal>Incorporated in the Federal Republic of Nigeria, ISRION International Ltd delivers high-quality professional services that meet international standards and contribute to economic development, environmental protection and long-term sustainability.</p>
+      <p data-reveal>Food, energy, water, climate and biodiversity are not separate problems. We work across disciplines so the answer to one never becomes the cause of another — combining technical expertise, advanced technologies and industry best practice for governments, industries, development agencies and communities.</p>
+    </div>
+  </div></div></section>
+
+  <!-- STATS -->
+  <section class="stats-band"><div class="wrap">
+    <div class="stat" data-reveal><span class="n" data-count="8">0</span><span class="l">Service domains</span></div>
+    <div class="stat" data-reveal><span class="n" data-count="12">0</span><span class="l">Sectors served</span></div>
+    <div class="stat" data-reveal><span class="n">{company.founded}</span><span class="l">Founded · FCT</span></div>
+    <div class="stat" data-reveal><span class="n">{company.rc.replace("RC ", "")}</span><span class="l">RC Number</span></div>
+  </div></section>
+
+  <!-- MISSION / OBJECTIVES -->
+  <section class="prose alt"><div class="wrap"><div class="grid">
+    <div>
+      <span class="eyebrow" data-reveal>Our objectives</span>
+      <h2 data-reveal>What we set out to deliver.</h2>
+    </div>
+    <div class="body">
+      <ul class="obj light">
+        {objectives.map((o, i) => <li data-n={pad(i)} data-reveal>{o}</li>)}
+      </ul>
+    </div>
+  </div></div></section>
+
+  <!-- VALUES -->
+  <section class="values-section"><div class="wrap">
+    <span class="eyebrow" data-reveal>What guides us</span>
+    <h2 data-reveal>Our values.</h2>
+    <div class="values-grid">
+      {values.map((v) => (
+        <div class="value-card" data-reveal><h4>{v.title}</h4><p>{v.body}</p></div>
+      ))}
+    </div>
+  </div></section>
+
+  <!-- LEADERSHIP -->
+  <section class="about" id="leadership">
+    <div class="glow" aria-hidden="true"></div>
+    <div class="wrap">
+      <span class="eyebrow on-dark" data-reveal>Leadership</span>
+      <h2 data-reveal style="margin:1.2rem 0 2rem">The people behind the work.</h2>
+      <div class="leaders cols">
+        {leaders.map((l) => (
+          <div class="leader" data-reveal>
+            <div class="av">{l.initials}</div>
+            <div>
+              <h4>{l.name}</h4>
+              <div class="role">{l.role}</div>
+              <p>{l.bio}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="home-cta"><div class="wrap">
+    <h2 data-reveal>Let's build something sustainable.</h2>
+    <p data-reveal>Talk to our team about your environmental, geospatial or energy challenge.</p>
+    <a href="/contact" class="btn btn-primary" data-reveal>Contact us
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+  </div></section>
+</BaseLayout>

@@ -21,11 +21,18 @@ export const company = {
   formspreeId: "xojzgypn",
 };
 
+// Primary navigation — individual pages (multi-page site).
+// "Contact Us" is rendered separately as the highlighted CTA button.
 export const nav = [
-  { label: "Capabilities", href: "#what" },
-  { label: "Approach", href: "#approach" },
-  { label: "Industries", href: "#industries" },
-  { label: "About", href: "#about" },
+  { label: "Home", href: "/" },
+  { label: "About Us", href: "/about" },
+  { label: "Services", href: "/services" },
+  { label: "Our Works", href: "/projects" },
+];
+
+export const socials = [
+  { label: "LinkedIn", href: "#" },
+  { label: "X", href: "#" },
 ];
 
 export const values = [
@@ -114,5 +121,60 @@ export const leaders = [
   {
     initials: "RE", name: "Mrs. Rabi Elabor", role: "Director",
     bio: "Strategic planning, stakeholder engagement and operational management, supporting the company's commitment to sustainable growth.",
+  },
+];
+
+// ---------------------------------------------------------------------------
+// PROJECTS / OUR WORKS — placeholder entries.
+// Replace text with real projects and drop images in /public, then set the
+// `image` field to e.g. "/projects/lagos-wetland.jpg" to show a photo instead
+// of the gradient placeholder.
+// ---------------------------------------------------------------------------
+export type Project = {
+  title: string;
+  sector: string;
+  year: string;
+  location: string;
+  summary: string;
+  tags: string[];
+  image?: string;
+};
+
+export const projects: Project[] = [
+  {
+    title: "Wetland Restoration & Monitoring",
+    sector: "Environmental", year: "2025", location: "Niger Delta, NG",
+    summary: "Baseline ecological survey and a multi-year monitoring framework to restore degraded wetland habitat around active industrial sites.",
+    tags: ["EIA", "Remediation", "Monitoring"],
+  },
+  {
+    title: "Regional Land-Use GIS Platform",
+    sector: "Geospatial", year: "2025", location: "FCT, NG",
+    summary: "Remote-sensing and GIS pipeline turning satellite imagery into a decision-support dashboard for sustainable regional planning.",
+    tags: ["GIS", "Remote sensing", "GeoAI"],
+  },
+  {
+    title: "Solar Feasibility & Integration Study",
+    sector: "Renewable Energy", year: "2024", location: "Kano, NG",
+    summary: "Technical and financial feasibility for a hybrid solar deployment, including efficiency modelling and a phased transition plan.",
+    tags: ["Solar", "Feasibility", "Transition"],
+  },
+  {
+    title: "Industrial ESG Reporting Programme",
+    sector: "ESG Advisory", year: "2024", location: "Lagos, NG",
+    summary: "End-to-end ESG strategy, materiality assessment and reporting aligned to international standards for a manufacturing client.",
+    tags: ["Strategy", "Reporting", "Risk"],
+  },
+  {
+    title: "Precision Agriculture Soil & Water Survey",
+    sector: "Agri-Tech", year: "2024", location: "Kaduna, NG",
+    summary: "Soil and water resource mapping with precision-agriculture recommendations to lift yields while protecting the watershed.",
+    tags: ["Soil & water", "Mapping", "Precision ag"],
+  },
+  {
+    title: "Infrastructure Feasibility & Due Diligence",
+    sector: "Engineering", year: "2023", location: "Abuja, NG",
+    summary: "Engineering feasibility, environmental due diligence and design review for a public infrastructure development.",
+    tags: ["Feasibility", "Due diligence", "Design review"],
   },
 ];

@@ -1,0 +1,52 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageHero from "../components/PageHero.astro";
+import { company, services, steps } from "../data/site";
+---
+<BaseLayout title={`Services — ${company.name}`}>
+  <PageHero
+    current="Services"
+    eyebrow="What we do"
+    title="Eight domains. One coordinated team."
+    subtitle="From environmental assessment to geospatial intelligence and renewable energy — integrated services that turn complex challenges into buildable, compliant outcomes."
+  />
+
+  <!-- SERVICE LIST -->
+  <section class="services-list"><div class="wrap">
+    <div class="svc-rows">
+      {services.map((s) => (
+        <article class="svc-row" data-reveal>
+          <div class="svc-row-idx"><span class="idx">{s.idx}</span><span class="cat">{s.cat}</span></div>
+          <div class="svc-row-body">
+            <h3 set:html={s.title} />
+            <p>{s.desc}</p>
+            <div class="tags">{s.tags.map((t) => <span>{t}</span>)}</div>
+          </div>
+        </article>
+      ))}
+    </div>
+  </div></section>
+
+  <!-- HOW WE WORK -->
+  <section class="approach"><div class="wrap">
+    <span class="eyebrow" data-reveal>How we work</span>
+    <h2 data-reveal>A clear path from question to outcome.</h2>
+    <div class="steps">
+      {steps.map((s) => (
+        <div class="step" data-reveal>
+          <span class="num">{s.num}</span>
+          <h4>{s.title}</h4>
+          <p>{s.body}</p>
+        </div>
+      ))}
+    </div>
+  </div></section>
+
+  <!-- CTA -->
+  <section class="home-cta"><div class="wrap">
+    <h2 data-reveal>Have a project in mind?</h2>
+    <p data-reveal>Tell us what you're working on and we'll map the right mix of services.</p>
+    <a href="/contact" class="btn btn-primary" data-reveal>Talk to our team
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+  </div></section>
+</BaseLayout>

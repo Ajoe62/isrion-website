@@ -1,0 +1,23 @@
+---
+// Compact page banner used at the top of every inner page.
+// The dark background keeps the (transparent-at-top) nav legible and gives
+// each page a consistent Jones-Edmunds-style header.
+interface Props {
+  eyebrow: string;
+  title: string;
+  subtitle?: string;
+  current: string; // breadcrumb label for the current page
+}
+const { eyebrow, title, subtitle, current } = Astro.props;
+---
+<section class="page-hero">
+  <div class="hero-glow" aria-hidden="true"></div>
+  <div class="wrap on-dark">
+    <nav class="crumb" aria-label="Breadcrumb" data-reveal>
+      <a href="/">Home</a><span aria-hidden="true">/</span><span>{current}</span>
+    </nav>
+    <span class="eyebrow on-dark" data-reveal>{eyebrow}</span>
+    <h1 data-reveal>{title}</h1>
+    {subtitle && <p class="lead" data-reveal>{subtitle}</p>}
+  </div>
+</section>
