@@ -97,6 +97,36 @@ function reveals() {
   });
 }
 
+// Background-image parallax. data-parallax="0.18" → element drifts at that
+// fraction of scroll distance. Elements are oversized in CSS so edges never show.
+function parallax() {
+  if (reduced()) return;
+  gsap.utils.toArray<HTMLElement>("[data-parallax]").forEach((el) => {
+    const amt = Number(el.dataset.parallax || 0.2);
+    gsap.fromTo(el, { yPercent: -amt * 50 }, {
+      yPercent: amt * 50, ease: "none",
+      scrollTrigger: { trigger: el.closest("section") || el, start: "top bottom", end: "bottom top", scrub: true },
+    });
+  });
+}
+
+// Count-up for [data-count] outside the home hero (e.g. the About stats band),
+// triggered when each number scrolls into view.
+function scrollCounters() {
+  gsap.utils.toArray<HTMLElement>("[data-count]").forEach((el) => {
+    if (el.closest(".hero")) return; // home hero handled by heroSequence
+    const end = Number(el.dataset.count || 0);
+    if (reduced()) { el.textContent = String(end); return; }
+    ScrollTrigger.create({
+      trigger: el, start: "top 90%", once: true,
+      onEnter: () => {
+        const o = { v: 0 };
+        gsap.to(o, { v: end, duration: 1.6, ease: "power2.out", onUpdate: () => (el.textContent = String(Math.round(o.v))) });
+      },
+    });
+  });
+}
+
 function capabilities() {
   const track = document.getElementById("hTrack");
   const bar = document.getElementById("capBar");
@@ -198,6 +228,8 @@ function setup() {
   heroVideo();
   heroSequence();
   reveals();
+  parallax();
+  scrollCounters();
   capabilities();
   ScrollTrigger.refresh();
 }

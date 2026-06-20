@@ -1,17 +1,25 @@
 ---
 // Compact page banner used at the top of every inner page.
-// The dark background keeps the (transparent-at-top) nav legible and gives
-// each page a consistent Jones-Edmunds-style header.
+// A parallax background image sits under a navy gradient overlay so the
+// (transparent-at-top) nav stays legible and each page gets a cinematic header.
 interface Props {
   eyebrow: string;
   title: string;
   subtitle?: string;
   current: string; // breadcrumb label for the current page
+  image?: string;  // optional background image (under the gradient overlay)
 }
-const { eyebrow, title, subtitle, current } = Astro.props;
+const { eyebrow, title, subtitle, current, image } = Astro.props;
 ---
-<section class="page-hero">
+<section class="page-hero" class:list={{ "has-img": image }}>
+  {image && (
+    <div class="page-hero-media" aria-hidden="true">
+      <img src={image} alt="" data-parallax="0.18" loading="eager" />
+    </div>
+  )}
+  <div class="page-hero-overlay" aria-hidden="true"></div>
   <div class="hero-glow" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
   <div class="wrap on-dark">
     <nav class="crumb" aria-label="Breadcrumb" data-reveal>
       <a href="/">Home</a><span aria-hidden="true">/</span><span>{current}</span>

@@ -10,13 +10,16 @@ const pad = (n: number) => String(n + 1).padStart(2, "0");
     eyebrow="The company"
     title="A focused, modern partner built for what's next."
     subtitle="A multidisciplinary consulting, technology, engineering and sustainability firm turning environmental, geospatial and energy challenges into data-driven, buildable outcomes."
+    image="/img/about-hero.jpg"
   />
 
-  <!-- WHO WE ARE -->
+  <!-- WHO WE ARE (sticky heading) -->
   <section class="prose"><div class="wrap"><div class="grid">
     <div>
-      <span class="eyebrow" data-reveal>Who we are</span>
-      <h2 data-reveal>Integrated answers to <span class="hl">interconnected</span> challenges.</h2>
+      <div class="sticky">
+        <span class="eyebrow" data-reveal>Who we are</span>
+        <h2 data-reveal>Integrated answers to <span class="hl">interconnected</span> challenges.</h2>
+      </div>
     </div>
     <div class="body">
       <p data-reveal>Incorporated in the Federal Republic of Nigeria, ISRION International Ltd delivers high-quality professional services that meet international standards and contribute to economic development, environmental protection and long-term sustainability.</p>
@@ -24,19 +27,34 @@ const pad = (n: number) => String(n + 1).padStart(2, "0");
     </div>
   </div></div></section>
 
-  <!-- STATS -->
-  <section class="stats-band"><div class="wrap">
-    <div class="stat" data-reveal><span class="n" data-count="8">0</span><span class="l">Service domains</span></div>
-    <div class="stat" data-reveal><span class="n" data-count="12">0</span><span class="l">Sectors served</span></div>
-    <div class="stat" data-reveal><span class="n">{company.founded}</span><span class="l">Founded · FCT</span></div>
-    <div class="stat" data-reveal><span class="n">{company.rc.replace("RC ", "")}</span><span class="l">RC Number</span></div>
+  <!-- BENTO: numbers + mission + image -->
+  <section class="bento-section"><div class="wrap">
+    <span class="eyebrow on-dark" data-reveal>By the numbers</span>
+    <h2 data-reveal>Built for measurable impact.</h2>
+    <div class="bento">
+      <div class="bento-cell bento-span2 bento-accent" data-reveal>
+        <h3>Our mission</h3>
+        <p>Deliver professional services that meet international standards and contribute to economic development, environmental protection and long-term sustainability.</p>
+      </div>
+      <div class="bento-cell" data-reveal><span class="k" data-count="8">0</span><span class="kl">Service domains</span></div>
+      <div class="bento-cell" data-reveal><span class="k" data-count="12">0</span><span class="kl">Sectors served</span></div>
+      <div class="bento-cell bento-img bento-span2" data-reveal>
+        <img src="/img/feature-office.jpg" alt="ISRION workspace" loading="lazy" />
+        <span class="cap">A focused, modern team</span>
+      </div>
+      <div class="bento-cell" data-reveal><span class="k">{company.founded}</span><span class="kl">Founded · FCT</span></div>
+      <div class="bento-cell" data-reveal><span class="k">{company.rc.replace("RC ", "")}</span><span class="kl">RC Number</span></div>
+      <div class="bento-cell bento-accent" data-reveal><h3>{company.short}</h3><p>{company.tagline}</p></div>
+    </div>
   </div></section>
 
-  <!-- MISSION / OBJECTIVES -->
+  <!-- OBJECTIVES (sticky heading) -->
   <section class="prose alt"><div class="wrap"><div class="grid">
     <div>
-      <span class="eyebrow" data-reveal>Our objectives</span>
-      <h2 data-reveal>What we set out to deliver.</h2>
+      <div class="sticky">
+        <span class="eyebrow" data-reveal>Our objectives</span>
+        <h2 data-reveal>What we set out to deliver.</h2>
+      </div>
     </div>
     <div class="body">
       <ul class="obj light">
