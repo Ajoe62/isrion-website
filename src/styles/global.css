@@ -8,6 +8,7 @@
   --blue:#0b5cc4; --azure:#4f9bff; --azure-soft:#9cc4ff;
   --green:#1f9d57; --green-bright:#3ecb7c;
   --paper:#ffffff; --mist:#f3f6fc; --tint:#cfe0f6; --ink:#0c1a2b; --muted:#5b6b7c;
+  --band:#074ca8; --band-card:#03255a; /* bold blue section band + its dark card */
   --line:rgba(0,51,125,.14); --line-dark:rgba(255,255,255,.14);
   --shadow:0 30px 70px -40px rgba(0,28,77,.55);
   --r:16px;
@@ -167,15 +168,18 @@ nav.menu a.nav-cta::after{display:none!important} nav.menu a.nav-cta:hover{backg
 @media(max-width:900px){.h-track{cursor:grab}}
 
 /* ===== APPROACH ===== */
-.approach{padding:var(--pad) 0;background:var(--mist)}
-.approach h2{font-size:clamp(1.9rem,1.4rem + 2.4vw,3.2rem);font-weight:500;max-width:18ch;margin-top:1.2rem}
+.approach{padding:var(--pad) 0;background:var(--band);color:#fff}
+.approach .eyebrow{color:var(--azure-soft)}
+.approach h2{font-size:clamp(1.9rem,1.4rem + 2.4vw,3.2rem);font-weight:500;max-width:18ch;margin-top:1.2rem;color:#fff}
 .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:1.4rem;margin-top:3rem}
-.step{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:1.8rem 1.6rem;position:relative;overflow:hidden}
-.step::before{content:"";position:absolute;left:0;top:0;width:100%;height:3px;background:var(--green);transform:scaleX(0);transform-origin:left;transition:transform .5s var(--bezier)}
+.step{background:var(--band-card);border:1px solid rgba(255,255,255,.14);border-radius:var(--r);padding:1.8rem 1.6rem;position:relative;overflow:hidden;
+  transition:border-color .35s,transform .35s var(--bezier)}
+.step:hover{transform:translateY(-4px);border-color:rgba(156,196,255,.5)}
+.step::before{content:"";position:absolute;left:0;top:0;width:100%;height:3px;background:var(--green-bright);transform:scaleX(0);transform-origin:left;transition:transform .5s var(--bezier)}
 .step:hover::before{transform:scaleX(1)}
-.step .num{font-family:"Space Mono",monospace;font-size:.78rem;letter-spacing:.18em;color:var(--blue)}
-.step h4{font-family:"Space Grotesk";font-size:1.18rem;margin:1rem 0 .6rem;color:var(--navy)}
-.step p{font-size:.92rem;color:var(--muted)}
+.step .num{font-family:"Space Mono",monospace;font-size:.78rem;letter-spacing:.18em;color:var(--azure-soft)}
+.step h4{font-family:"Space Grotesk";font-size:1.18rem;margin:1rem 0 .6rem;color:#fff}
+.step p{font-size:.92rem;color:rgba(255,255,255,.8)}
 @media(max-width:900px){.steps{grid-template-columns:1fr 1fr}}
 @media(max-width:560px){.steps{grid-template-columns:1fr}}
 
@@ -340,13 +344,16 @@ nav.menu a[aria-current="page"]::after{width:100%}
 .stats-band .wrap{display:grid;grid-template-columns:repeat(4,1fr);gap:2rem}
 .stats-band .stat .n{font-family:"Space Grotesk";font-size:clamp(2rem,1.5rem + 1.5vw,2.8rem);font-weight:600;color:#fff;display:block;line-height:1}
 .stats-band .stat .l{font-family:"Space Mono",monospace;font-size:.66rem;letter-spacing:.18em;text-transform:uppercase;color:var(--azure-soft);margin-top:.6rem;display:block}
-.values-section{padding:var(--pad) 0;background:var(--tint)}
-.values-section h2{font-size:clamp(1.9rem,1.4rem + 2.4vw,3.2rem);font-weight:500;margin:1.2rem 0 2.4rem}
+.values-section{padding:var(--pad) 0;background:var(--band);color:#fff}
+.values-section .eyebrow{color:var(--azure-soft)}
+.values-section h2{font-size:clamp(1.9rem,1.4rem + 2.4vw,3.2rem);font-weight:500;margin:1.2rem 0 2.4rem;color:#fff}
 .values-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.4rem}
-.value-card{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:1.8rem 1.6rem}
-.value-card h4{font-family:"Space Grotesk";font-size:1.1rem;color:var(--navy);display:flex;align-items:center;gap:.6rem}
-.value-card h4::before{content:"";width:8px;height:8px;border-radius:2px;background:var(--green);flex:none}
-.value-card p{font-size:.92rem;color:var(--muted);margin-top:.6rem}
+.value-card{background:var(--band-card);border:1px solid rgba(255,255,255,.14);border-radius:var(--r);padding:1.8rem 1.6rem;
+  transition:border-color .35s,transform .35s var(--bezier)}
+.value-card:hover{transform:translateY(-4px);border-color:rgba(156,196,255,.5)}
+.value-card h4{font-family:"Space Grotesk";font-size:1.1rem;color:#fff;display:flex;align-items:center;gap:.6rem}
+.value-card h4::before{content:"";width:8px;height:8px;border-radius:2px;background:var(--green-bright);flex:none}
+.value-card p{font-size:.92rem;color:rgba(255,255,255,.8);margin-top:.6rem}
 .leaders.cols{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
 
 /* ---- Services page: detailed rows ---- */
