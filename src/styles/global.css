@@ -375,6 +375,15 @@ nav.menu a[aria-current="page"]::after{width:100%}
 .svc-row-body .tags{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1.2rem}
 .svc-row-body .tags span{font-family:"Space Mono",monospace;font-size:.62rem;letter-spacing:.08em;color:var(--blue);
   border:1px solid var(--line);border-radius:100px;padding:.32rem .7rem}
+/* alternate row colour: odd = dark blue (#03255A) with light text, even = white */
+.svc-row:nth-child(odd){background:var(--band-card);border-color:rgba(255,255,255,.16)}
+.svc-row:nth-child(odd) .svc-row-idx .idx{background:linear-gradient(135deg,var(--azure),var(--green-bright));
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.svc-row:nth-child(odd) .svc-row-idx .cat{color:var(--azure-soft)}
+.svc-row:nth-child(odd) .svc-row-body h3{color:#fff}
+.svc-row:nth-child(odd) .svc-row-body p{color:rgba(255,255,255,.82)}
+.svc-row:nth-child(odd) .svc-row-body .tags span{color:var(--azure-soft);border-color:rgba(255,255,255,.24)}
+.svc-row:nth-child(odd):hover{border-color:rgba(156,196,255,.5)}
 
 /* ---- Contact page ---- */
 .contact-section{padding:var(--pad) 0;color:#fff;
