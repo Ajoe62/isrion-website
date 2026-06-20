@@ -46,27 +46,37 @@ function counters() {
 }
 
 function heroVideo() {
-  const v0 = document.getElementById("heroVid0") as HTMLVideoElement | null;
-  const v1 = document.getElementById("heroVid1") as HTMLVideoElement | null;
-  if (!v0 || !v1) return;
-  if (reduced()) { v0.style.display = "none"; v1.style.display = "none"; return; }
+  const vids = Array.from(document.querySelectorAll<HTMLVideoElement>(".hero-vid"));
+  if (!vids.length) return;
+  if (reduced()) { vids.forEach((v) => (v.style.display = "none")); return; }
 
-  gsap.set(v0, { opacity: 1 });
+  gsap.set(vids[0], { opacity: 1 });
+  let current = 0;
 
-  const crossfade = (from: HTMLVideoElement, to: HTMLVideoElement) => {
-    to.play();
-    gsap.to(to, { opacity: 1, duration: 1.5, ease: "power2.inOut" });
-    gsap.to(from, { opacity: 0, duration: 1.5, ease: "power2.inOut" });
+  // Each clip cross-fades to the next when it ends, wrapping back to the first.
+  // Videos use preload="none" (except the first), so we kick off a load just
+  // before a clip is needed to keep the rotation seamless without loading all
+  // of them up front.
+  const advance = (from: number) => {
+    const to = (from + 1) % vids.length;
+    vids[to].play();
+    gsap.to(vids[to], { opacity: 1, duration: 1.5, ease: "power2.inOut" });
+    gsap.to(vids[from], {
+      opacity: 0, duration: 1.5, ease: "power2.inOut",
+      onComplete: () => { vids[from].pause(); vids[from].currentTime = 0; },
+    });
+    current = to;
+    vids[(to + 1) % vids.length].load(); // warm up the clip after next
   };
 
-  const onV0Ended = () => crossfade(v0, v1);
-  const onV1Ended = () => crossfade(v1, v0);
-  v0.addEventListener("ended", onV0Ended);
-  v1.addEventListener("ended", onV1Ended);
-  cleanups.push(() => {
-    v0.removeEventListener("ended", onV0Ended);
-    v1.removeEventListener("ended", onV1Ended);
+  const handlers = vids.map((v, i) => {
+    const onEnded = () => { if (i === current) advance(i); };
+    v.addEventListener("ended", onEnded);
+    return { v, onEnded };
   });
+  vids[1 % vids.length]?.load(); // warm up the second clip
+
+  cleanups.push(() => handlers.forEach(({ v, onEnded }) => v.removeEventListener("ended", onEnded)));
 }
 
 function heroSequence() {

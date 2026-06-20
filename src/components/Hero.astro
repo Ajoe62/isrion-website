@@ -1,14 +1,16 @@
 ---
 import { company } from "../data/site";
+// Background videos that cross-fade in sequence (see heroVideo() in motion.ts).
+// Add/remove files here — the rotation adapts to any count.
+const heroVideos = ["/hero.mp4", "/hero1.mp4", "/hero2.mp4", "/hero3.mp4", "/hero4.mp4", "/hero5.mp4"];
 ---
 <section class="hero" id="home">
   <div class="hero-video-bg" aria-hidden="true">
-    <video id="heroVid0" class="hero-vid" autoplay muted playsinline>
-      <source src="/hero.mp4" type="video/mp4" />
-    </video>
-    <video id="heroVid1" class="hero-vid" muted playsinline>
-      <source src="/hero1.mp4" type="video/mp4" />
-    </video>
+    {heroVideos.map((src, i) => (
+      <video id={`heroVid${i}`} class="hero-vid" muted playsinline preload={i === 0 ? "auto" : "none"} autoplay={i === 0}>
+        <source src={src} type="video/mp4" />
+      </video>
+    ))}
   </div>
   <canvas id="contour" aria-hidden="true"></canvas>
   <div class="hero-glow" aria-hidden="true"></div>
