@@ -7,7 +7,7 @@ export const company = {
   name: "ISRION International Ltd",
   short: "ISRION",
   rc: "RC 9120351",
-  email: "isaelabor22@gmail.com",
+  email: "isrioninternational@gmail.com",
   location: "Kubwa · FCT · Nigeria",
   address: "Flat 2, Block 59 Kubwa II, Kubwa, FCT, Nigeria",
   founded: "2025",
