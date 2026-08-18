@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import PageHero from "../components/PageHero.astro";
+import MapGallery from "../components/MapGallery.astro";
 import { company, projects } from "../data/site";
 ---
 <BaseLayout title={`Our Works — ${company.name}`}>
@@ -28,6 +29,8 @@ import { company, projects } from "../data/site";
       ))}
     </div>
   </div></section>
+
+  <MapGallery />
 
   <!-- CTA -->
   <section class="home-cta"><div class="wrap">

@@ -324,6 +324,81 @@ nav.menu a[aria-current="page"]::after{width:100%}
 .proj-card .tags span{font-family:"Space Mono",monospace;font-size:.6rem;letter-spacing:.08em;color:var(--blue);
   border:1px solid var(--line);border-radius:100px;padding:.3rem .6rem}
 
+/* ---- Map gallery (Our Works) ----------------------------------------------
+   Bold blue band with dark navy cards, matching .svc-card / .value-card / .step.
+   The section above it (.projects-list) is light --tint, so this alternates —
+   and colourful cartography reads far better mounted on dark than on white.
+   --------------------------------------------------------------------------- */
+.maps-section{padding:var(--pad) 0;background:var(--band);color:#fff}
+.maps-head{max-width:64ch;margin-bottom:clamp(2.2rem,4vw,3.4rem)}
+.maps-head h2{font-size:clamp(1.9rem,1.4rem + 2.4vw,3.2rem);font-weight:500;margin:1.1rem 0 1.1rem;max-width:20ch}
+.maps-head p{color:rgba(255,255,255,.78);font-size:1.05rem}
+
+/* Two per row so each pollutant's before/after pair reads as one comparison. */
+.map-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.6rem}
+.map-card{display:flex;flex-direction:column;background:var(--band-card);
+  border:1px solid rgba(255,255,255,.14);border-radius:var(--r);overflow:hidden;
+  transition:border-color .35s,transform .35s var(--bezier),box-shadow .35s}
+.map-card:hover{transform:translateY(-6px);border-color:rgba(255,255,255,.34);
+  box-shadow:0 34px 70px -38px rgba(0,10,30,.85)}
+
+/* museum-label header strip */
+.map-card-head{display:flex;align-items:center;gap:.7rem;padding:1rem 1.4rem;
+  border-bottom:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.03)}
+.map-chip{font-family:"Space Mono",monospace;font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;
+  color:#fff;background:var(--accent,var(--blue));border-radius:100px;padding:.3rem .75rem;flex:none}
+.map-name{font-family:"Space Mono",monospace;font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;
+  color:rgba(255,255,255,.6);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.map-year{margin-left:auto;font-family:"Space Grotesk",sans-serif;font-size:1.05rem;font-weight:600;
+  color:#fff;letter-spacing:.02em;flex:none}
+
+/* The plate. contain (not cover) — the legend carries the meaning, never crop it. */
+.map-plate{display:block;position:relative;width:100%;border:0;padding:0;cursor:zoom-in;
+  background:#fff;aspect-ratio:1.414;overflow:hidden;font:inherit;color:inherit}
+.map-plate img{width:100%;height:100%;object-fit:contain}
+.map-plate::after{content:"";position:absolute;inset:0;pointer-events:none;
+  box-shadow:inset 0 0 0 1px rgba(0,17,41,.08);
+  background:linear-gradient(180deg,transparent 62%,rgba(0,17,41,.16) 100%);
+  opacity:0;transition:opacity .35s}
+.map-card:hover .map-plate::after,.map-plate:focus-visible::after{opacity:1}
+.map-expand{position:absolute;right:.9rem;bottom:.9rem;z-index:2;display:inline-flex;align-items:center;gap:.5rem;
+  font-family:"Space Mono",monospace;font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;color:#fff;
+  background:rgba(0,17,41,.78);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.28);
+  border-radius:100px;padding:.45rem .85rem;
+  opacity:0;transform:translateY(6px);transition:opacity .3s,transform .35s var(--bezier)}
+.map-expand svg{width:13px;height:13px}
+.map-card:hover .map-expand,.map-plate:focus-visible .map-expand{opacity:1;transform:none}
+.map-plate:focus-visible{outline:2px solid var(--azure);outline-offset:-2px}
+
+.map-body{padding:1.4rem 1.5rem 1.6rem;display:flex;flex-direction:column;flex:1}
+.map-body h3{font-family:"Space Grotesk",sans-serif;font-size:1.12rem;font-weight:600;color:#fff;line-height:1.25}
+.map-body p{color:rgba(255,255,255,.7);font-size:.93rem;margin-top:.7rem}
+.map-spec{display:flex;flex-wrap:wrap;gap:.4rem 1.1rem;margin-top:auto;padding-top:1.2rem;
+  font-family:"Space Mono",monospace;font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--azure)}
+.map-spec span:first-child{color:#fff;position:relative;padding-left:.9rem}
+.map-spec span:first-child::before{content:"";position:absolute;left:0;top:50%;transform:translateY(-50%);
+  width:5px;height:5px;border-radius:50%;background:var(--accent,var(--azure))}
+.map-tags{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.9rem}
+.map-tags span{font-family:"Space Mono",monospace;font-size:.6rem;letter-spacing:.08em;color:rgba(255,255,255,.72);
+  border:1px solid rgba(255,255,255,.2);border-radius:100px;padding:.3rem .65rem}
+
+/* ---- Map lightbox ---- */
+.map-lightbox{width:min(1400px,94vw);max-width:none;max-height:92vh;padding:0;border:0;border-radius:var(--r);
+  background:var(--navy-950);color:#fff;overflow:hidden;box-shadow:0 50px 120px -40px rgba(0,0,0,.8)}
+.map-lightbox::backdrop{background:rgba(0,11,26,.82);backdrop-filter:blur(6px)}
+.map-lightbox figure{display:flex;flex-direction:column;max-height:92vh}
+.map-lightbox img{width:100%;flex:1;min-height:0;object-fit:contain;background:#fff}
+.map-lightbox figcaption{padding:1.3rem clamp(1.2rem,3vw,2rem);border-top:1px solid var(--line-dark);flex:none}
+.map-lightbox figcaption h3{font-family:"Space Grotesk",sans-serif;font-size:1.15rem;font-weight:600;color:#fff}
+.map-lightbox figcaption p{color:rgba(255,255,255,.72);font-size:.92rem;margin-top:.5rem;max-width:90ch}
+.ml-range{display:inline-block;margin-top:.8rem;font-family:"Space Mono",monospace;font-size:.68rem;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--azure)}
+.ml-close{position:absolute;top:.9rem;right:.9rem;z-index:3;width:44px;height:44px;display:grid;place-items:center;
+  border-radius:50%;cursor:pointer;color:#fff;background:rgba(0,17,41,.7);backdrop-filter:blur(6px);
+  border:1px solid rgba(255,255,255,.28);transition:background .3s,transform .3s var(--bezier)}
+.ml-close svg{width:18px;height:18px}
+.ml-close:hover{background:var(--blue);transform:rotate(90deg)}
+
 /* ---- Shared centred CTA strip ---- */
 .home-cta{padding:clamp(3.5rem,7vw,6rem) 0;background:linear-gradient(120deg,var(--navy),var(--blue));color:#fff;text-align:center}
 .home-cta h2{font-size:clamp(1.8rem,1.4rem + 2.4vw,3rem);font-weight:500;max-width:20ch;margin:0 auto 1rem}
@@ -455,6 +530,7 @@ nav.menu a[aria-current="page"]::after{width:100%}
   /* multi-page layouts collapse to single/two columns */
   .home-intro .grid,.prose .grid,.contact-grid{grid-template-columns:1fr;gap:2.4rem}
   .svc-grid,.proj-grid,.values-grid{grid-template-columns:1fr 1fr}
+  .map-grid{grid-template-columns:1fr}
   .leaders.cols{grid-template-columns:1fr}
   .prose .grid > div:first-child .sticky,.sticky-head{position:static}
   .bento{grid-template-columns:1fr 1fr}
@@ -483,6 +559,14 @@ nav.menu a[aria-current="page"]::after{width:100%}
   .svc-row-idx .idx{font-size:2.2rem}
   .map-section iframe{height:320px}
   .bento{grid-template-columns:1fr}
+  /* lightbox goes near-fullscreen; caption scrolls under the plate */
+  .map-lightbox{width:100vw;max-height:100dvh;border-radius:0}
+  .map-lightbox figure{max-height:100dvh;overflow-y:auto}
+  .map-lightbox img{flex:none}
+  .map-card-head{padding:.85rem 1.1rem}
+  .map-body{padding:1.2rem 1.2rem 1.4rem}
+  /* no hover on touch — keep the expand affordance permanently visible */
+  .map-expand{opacity:1;transform:none}
 }
 
 /* ---- Small phones (≤460px) ---- */

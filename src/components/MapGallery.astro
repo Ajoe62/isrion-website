@@ -1,0 +1,171 @@
+---
+// Cartography gallery for the "Our Works" page.
+//
+// Images live in src/assets/maps/ so Astro's image pipeline (sharp) converts
+// them to WebP, builds a responsive srcset and emits them into /_astro/, which
+// both netlify.toml and vercel.json already cache immutable. The raw exports
+// here are ~10,500px wide and 2 MB each — shipping them from public/ verbatim
+// would not be viable.
+//
+// Each map is rendered *whole* (object-fit: contain) rather than cropped: the
+// legend carries the meaning, so cropping it would destroy the plate.
+import { Image, getImage } from "astro:assets";
+import type { ImageMetadata } from "astro";
+import { maps } from "../data/maps";
+
+// Resolve every file in the folder at build time, then match by filename.
+const files = import.meta.glob<{ default: ImageMetadata }>(
+  "../assets/maps/*.{png,jpg,jpeg,webp}",
+  { eager: true },
+);
+
+const plates = await Promise.all(
+  maps.map(async (m) => {
+    const entry = files[`../assets/maps/${m.file}`];
+    if (!entry) {
+      throw new Error(
+        `[MapGallery] src/assets/maps/${m.file} not found. ` +
+          `Check the \`file\` value in src/data/maps.ts against the actual filename.`,
+      );
+    }
+    const src = entry.default;
+    // Larger render for the lightbox, where the reader is inspecting detail.
+    const full = await getImage({ src, width: 2000, format: "webp", quality: 62 });
+    return { ...m, src, full: full.src };
+  }),
+);
+---
+
+<section class="maps-section">
+  <div class="wrap">
+    <header class="maps-head">
+      <span class="eyebrow on-dark" data-reveal>Cartography</span>
+      <h2 data-reveal>Air quality across Nigeria, mapped.</h2>
+      <p data-reveal>
+        A national atlas of atmospheric pollutants — methane, nitrogen dioxide and fine
+        particulate matter — resolved below state level and paired across years so change
+        is visible at a glance. Select any plate to open it full size.
+      </p>
+    </header>
+
+    <div class="map-grid">
+      {plates.map((m) => (
+        <article class="map-card" data-reveal style={`--accent:${m.accent}`}>
+          <div class="map-card-head">
+            <span class="map-chip">{m.pollutant}</span>
+            <span class="map-name">{m.pollutantName}</span>
+            <span class="map-year">{m.year}</span>
+          </div>
+
+          <button
+            class="map-plate"
+            type="button"
+            data-map-open
+            data-full={m.full}
+            data-title={`${m.title} — ${m.year}`}
+            data-desc={m.description}
+            data-range={m.range}
+            aria-label={`Open ${m.pollutantName} ${m.year} map at full size`}
+          >
+            <Image
+              src={m.src}
+              alt={`Choropleth map of Nigeria showing annual mean ${m.pollutantName} concentration in ${m.year}, ${m.range}, with state boundaries and labels.`}
+              width={1280}
+              widths={[640, 960, 1280]}
+              sizes="(max-width:900px) 92vw, 44vw"
+              format="webp"
+              quality={78}
+              loading="lazy"
+            />
+            <span class="map-expand" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
+              </svg>
+              View full map
+            </span>
+          </button>
+
+          <div class="map-body">
+            <h3>{m.title}</h3>
+            <p>{m.description}</p>
+            <div class="map-spec">
+              <span>{m.range}</span>
+              <span>{m.extent}</span>
+            </div>
+            <div class="map-tags">{m.tags.map((t) => <span>{t}</span>)}</div>
+          </div>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- Full-size viewer. Native <dialog> gives a real focus trap + Esc for free. -->
+<dialog class="map-lightbox" aria-label="Map viewer">
+  <button class="ml-close" type="button" data-map-close aria-label="Close map viewer">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <path d="M6 6l12 12M18 6L6 18"/>
+    </svg>
+  </button>
+  <figure>
+    <img alt="" />
+    <figcaption>
+      <h3></h3>
+      <p></p>
+      <span class="ml-range"></span>
+    </figcaption>
+  </figure>
+</dialog>
+
+<script>
+  // Delegated on `document` and registered once: the listener outlives
+  // ClientRouter view transitions, and the dialog is re-queried per click so it
+  // always targets the current page's markup.
+  declare global { interface Window { __lenis?: { stop(): void; start(): void } } }
+
+  if (!(window as any).__mapLightboxBound) {
+    (window as any).__mapLightboxBound = true;
+
+    const dlg = () => document.querySelector<HTMLDialogElement>(".map-lightbox");
+
+    const close = () => {
+      const d = dlg();
+      if (!d?.open) return;
+      d.close();
+    };
+
+    document.addEventListener("click", (e) => {
+      const target = e.target as HTMLElement;
+
+      const opener = target.closest<HTMLElement>("[data-map-open]");
+      if (opener) {
+        const d = dlg();
+        if (!d) return;
+        const img = d.querySelector("img")!;
+        img.src = opener.dataset.full || "";
+        img.alt = opener.querySelector("img")?.alt || "";
+        d.querySelector("figcaption h3")!.textContent = opener.dataset.title || "";
+        d.querySelector("figcaption p")!.textContent = opener.dataset.desc || "";
+        d.querySelector(".ml-range")!.textContent = opener.dataset.range || "";
+        d.showModal();
+        // Pause Lenis so the page doesn't drift behind the overlay; the
+        // overflow lock covers the reduced-motion case where Lenis is absent.
+        window.__lenis?.stop();
+        document.documentElement.style.overflow = "hidden";
+        return;
+      }
+
+      // Close button, or a click on the backdrop (target is the dialog itself).
+      if (target.closest("[data-map-close]") || target.classList.contains("map-lightbox")) close();
+    });
+
+    document.addEventListener("close", (e) => {
+      if (!(e.target as HTMLElement)?.classList?.contains("map-lightbox")) return;
+      window.__lenis?.start();
+      document.documentElement.style.overflow = "";
+      const img = (e.target as HTMLDialogElement).querySelector("img");
+      if (img) img.src = ""; // release the 2400px decode
+    }, true);
+  }
+</script>

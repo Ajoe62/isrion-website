@@ -19,6 +19,8 @@ function initLenis() {
   if (reduced() || lenis) return;
   lenis = new Lenis({ lerp: 0.09, wheelMultiplier: 1 });
   lenis.on("scroll", ScrollTrigger.update);
+  // Exposed so overlays (the map lightbox) can pause smooth scroll while open.
+  (window as any).__lenis = lenis;
   gsap.ticker.add((time) => lenis!.raf(time * 1000));
   gsap.ticker.lagSmoothing(0);
 }
