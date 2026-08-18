@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// ISRION International Ltd — site content
+// ISRION International Ltd: site content
 // Edit text here and it flows into the components. No markup changes needed.
 // ---------------------------------------------------------------------------
 
@@ -14,14 +14,14 @@ export const company = {
   tagline: "Innovative Solutions · Sustainable Futures",
   // Used for SEO + sitemap. Change to your real domain once registered.
   url: "https://www.isrion.com",
-  coords: "09.04°N · 07.36°E — Abuja, Nigeria",
-  // Formspree form ID — powers the contact form on any static host (Vercel etc).
+  coords: "09.04°N · 07.36°E · Abuja, Nigeria",
+  // Formspree form ID; powers the contact form on any static host (Vercel etc).
   // Create a free form at https://formspree.io and paste the ID from the
   // endpoint it gives you (https://formspree.io/f/XXXXXXXX → use "XXXXXXXX").
   formspreeId: "xojzgypn",
 };
 
-// Primary navigation — individual pages (multi-page site).
+// Primary navigation: individual pages (multi-page site).
 // "Contact Us" is rendered separately as the highlighted CTA button.
 export const nav = [
   { label: "Home", href: "/" },
@@ -97,7 +97,7 @@ export const steps = [
   { num: "STEP 01", title: "Listen & scope", body: "We define the real problem with you, mapping constraints, stakeholders and success criteria." },
   { num: "STEP 02", title: "Assess & analyse", body: "Field data, GIS and remote sensing build an evidence base you can trust." },
   { num: "STEP 03", title: "Design the solution", body: "Engineering, sustainability and technology combine into a buildable, compliant plan." },
-  { num: "STEP 04", title: "Deliver & monitor", body: "We implement, measure impact and adapt — so results hold over the long term." },
+  { num: "STEP 04", title: "Deliver & monitor", body: "We implement, measure impact and adapt, so results hold over the long term." },
 ];
 
 export const industries = [
@@ -125,7 +125,7 @@ export const leaders = [
 ];
 
 // ---------------------------------------------------------------------------
-// PROJECTS / OUR WORKS — placeholder entries.
+// PROJECTS / OUR WORKS: placeholder entries.
 // Replace text with real projects and drop images in /public, then set the
 // `image` field to e.g. "/projects/lagos-wetland.jpg" to show a photo instead
 // of the gradient placeholder.

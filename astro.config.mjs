@@ -2,7 +2,7 @@
 import { defineConfig } from "astro/config";
 import sitemap from "@astrojs/sitemap";
 
-// Update `site` to your real domain once registered — it powers the sitemap.
+// Update `site` to your real domain once registered; it powers the sitemap.
 export default defineConfig({
   site: "https://www.isrion.com",
   integrations: [sitemap()],

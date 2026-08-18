@@ -2,7 +2,7 @@
 import { company } from "../data/site";
 ---
 <!--
-  Formspree: host-agnostic (works on Vercel, Cloudflare Pages, etc.) — no backend.
+  Formspree: host-agnostic (works on Vercel, Cloudflare Pages, etc.); no backend.
   Submits via fetch() so the visitor stays on the page; `_gotcha` is the spam honeypot.
   Set the form ID in src/data/site.ts (company.formspreeId).
 -->
@@ -13,7 +13,7 @@ import { company } from "../data/site";
   data-reveal
   id="contactForm"
 >
-  <input type="hidden" name="_subject" value="New enquiry — ISRION website" />
+  <input type="hidden" name="_subject" value="New enquiry: ISRION website" />
   <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" style="display:none" aria-hidden="true" />
 
   <div class="row2">
@@ -53,7 +53,7 @@ import { company } from "../data/site";
         });
         if (res.ok) {
           form.reset();
-          show("Thanks — your message has been sent. We'll be in touch shortly.", true);
+          show("Thanks, your message has been sent. We'll be in touch shortly.", true);
         } else {
           const data = await res.json().catch(() => null);
           const msg = data?.errors?.map((x: { message: string }) => x.message).join(", ");

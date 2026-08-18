@@ -1,8 +1,8 @@
 // ---------------------------------------------------------------------------
-// MAPS / CARTOGRAPHY — the map gallery on the "Our Works" page.
+// MAPS / CARTOGRAPHY: the map gallery on the "Our Works" page.
 //
 // To add a map:
-//   1. Drop the raster into  src/assets/maps/   (PNG / JPG / WebP — not PDF)
+//   1. Drop the raster into  src/assets/maps/   (PNG / JPG / WebP, not PDF)
 //   2. Add an entry below with `file` set to the exact filename.
 // The build fails by name if a `file` has no matching image, so a typo can
 // never ship as a silently broken card.
@@ -30,7 +30,7 @@ export const maps: MapWork[] = [
     pollutant: "CH4", pollutantName: "Methane", year: "2020",
     title: "Annual Mean CH₄ Concentration over Nigeria",
     description:
-      "Baseline national methane surface. Concentrations climb out of the humid south — the Niger Delta and the south-west hold the lowest readings — into a broad elevated band across the middle belt and north-east, peaking through Nassarawa, Benue, Taraba, Gombe and Borno.",
+      "Baseline national methane surface. Concentrations climb out of the humid south (the Niger Delta and the south-west hold the lowest readings) into a broad elevated band across the middle belt and north-east, peaking through Nassarawa, Benue, Taraba, Gombe and Borno.",
     range: "1,783 – 1,959 ppb",
     extent: "Nigeria · 36 states + FCT",
     tags: ["Annual mean", "5-class choropleth", "Sub-state resolution"],
@@ -74,7 +74,7 @@ export const maps: MapWork[] = [
     pollutant: "PM2.5", pollutantName: "Fine Particulate Matter", year: "2020",
     title: "Annual Mean PM₂.₅ Concentration over Nigeria",
     description:
-      "Fine particulate matter follows the harmattan dust regime rather than the cities — a pronounced maximum across Katsina, Kano, Jigawa, Bauchi and northern Kaduna, falling steadily southward to the cleanest air along the coast and in the south-east.",
+      "Fine particulate matter follows the harmattan dust regime rather than the cities: a pronounced maximum across Katsina, Kano, Jigawa, Bauchi and northern Kaduna, falling steadily southward to the cleanest air along the coast and in the south-east.",
     range: "2.57 – 10.09 µg/m³",
     extent: "Nigeria · 36 states + FCT",
     tags: ["Annual mean", "Dust regime", "Public health"],

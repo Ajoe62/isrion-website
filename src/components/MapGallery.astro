@@ -4,7 +4,7 @@
 // Images live in src/assets/maps/ so Astro's image pipeline (sharp) converts
 // them to WebP, builds a responsive srcset and emits them into /_astro/, which
 // both netlify.toml and vercel.json already cache immutable. The raw exports
-// here are ~10,500px wide and 2 MB each — shipping them from public/ verbatim
+// here are ~10,500px wide and 2 MB each, so shipping them from public/ verbatim
 // would not be viable.
 //
 // Each map is rendered *whole* (object-fit: contain) rather than cropped: the
@@ -42,8 +42,8 @@ const plates = await Promise.all(
       <span class="eyebrow on-dark" data-reveal>Cartography</span>
       <h2 data-reveal>Air quality across Nigeria, mapped.</h2>
       <p data-reveal>
-        A national atlas of atmospheric pollutants — methane, nitrogen dioxide and fine
-        particulate matter — resolved below state level and paired across years so change
+        A national atlas of atmospheric pollutants (methane, nitrogen dioxide and fine
+        particulate matter) resolved below state level and paired across years so change
         is visible at a glance. Select any plate to open it full size.
       </p>
     </header>
@@ -62,7 +62,7 @@ const plates = await Promise.all(
             type="button"
             data-map-open
             data-full={m.full}
-            data-title={`${m.title} — ${m.year}`}
+            data-title={`${m.title} (${m.year})`}
             data-desc={m.description}
             data-range={m.range}
             aria-label={`Open ${m.pollutantName} ${m.year} map at full size`}

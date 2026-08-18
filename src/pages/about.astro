@@ -4,7 +4,7 @@ import PageHero from "../components/PageHero.astro";
 import { company, values, objectives, leaders } from "../data/site";
 const pad = (n: number) => String(n + 1).padStart(2, "0");
 ---
-<BaseLayout title={`About Us — ${company.name}`}>
+<BaseLayout title={`About Us | ${company.name}`}>
   <PageHero
     current="About Us"
     eyebrow="The company"
@@ -23,7 +23,7 @@ const pad = (n: number) => String(n + 1).padStart(2, "0");
     </div>
     <div class="body">
       <p data-reveal>Incorporated in the Federal Republic of Nigeria, ISRION International Ltd delivers high-quality professional services that meet international standards and contribute to economic development, environmental protection and long-term sustainability.</p>
-      <p data-reveal>Food, energy, water, climate and biodiversity are not separate problems. We work across disciplines so the answer to one never becomes the cause of another — combining technical expertise, advanced technologies and industry best practice for governments, industries, development agencies and communities.</p>
+      <p data-reveal>Food, energy, water, climate and biodiversity are not separate problems. We work across disciplines so the answer to one never becomes the cause of another, combining technical expertise, advanced technologies and industry best practice for governments, industries, development agencies and communities.</p>
     </div>
   </div></div></section>
 

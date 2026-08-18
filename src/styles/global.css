@@ -1,5 +1,5 @@
 /* ===========================================================================
-   ISRION International Ltd — global styles
+   ISRION International Ltd: global styles
    Design tokens live in :root. Section styles are grouped and labelled below.
    =========================================================================== */
 
@@ -49,7 +49,7 @@ img{display:block;max-width:100%}
 .arrow-link:hover{gap:.85rem}
 .arrow-link svg{width:15px;height:15px}
 
-/* reveal primitives — hidden only when JS is active (see is:inline head script) */
+/* reveal primitives: hidden only when JS is active (see is:inline head script) */
 .js [data-reveal]{opacity:0;transform:translateY(34px)}
 .js [data-mask]{overflow:hidden}
 .js [data-mask] > *{display:block;transform:translateY(110%)}
@@ -239,7 +239,7 @@ footer ul a:hover{color:#fff}
 @media(max-width:820px){.foot-grid{grid-template-columns:1fr 1fr}.foot-brand{grid-column:1/-1}}
 
 /* ===========================================================================
-   MULTI-PAGE LAYOUTS — page hero, home teasers, services, projects, contact
+   MULTI-PAGE LAYOUTS: page hero, home teasers, services, projects, contact
    =========================================================================== */
 
 /* active nav link */
@@ -326,7 +326,7 @@ nav.menu a[aria-current="page"]::after{width:100%}
 
 /* ---- Map gallery (Our Works) ----------------------------------------------
    Bold blue band with dark navy cards, matching .svc-card / .value-card / .step.
-   The section above it (.projects-list) is light --tint, so this alternates —
+   The section above it (.projects-list) is light --tint, so this alternates,
    and colourful cartography reads far better mounted on dark than on white.
    --------------------------------------------------------------------------- */
 .maps-section{padding:var(--pad) 0;background:var(--band);color:#fff}
@@ -352,7 +352,7 @@ nav.menu a[aria-current="page"]::after{width:100%}
 .map-year{margin-left:auto;font-family:"Space Grotesk",sans-serif;font-size:1.05rem;font-weight:600;
   color:#fff;letter-spacing:.02em;flex:none}
 
-/* The plate. contain (not cover) — the legend carries the meaning, never crop it. */
+/* The plate. contain (not cover): the legend carries the meaning, never crop it. */
 .map-plate{display:block;position:relative;width:100%;border:0;padding:0;cursor:zoom-in;
   background:#fff;aspect-ratio:1.414;overflow:hidden;font:inherit;color:inherit}
 .map-plate img{width:100%;height:100%;object-fit:contain}
@@ -474,7 +474,7 @@ nav.menu a[aria-current="page"]::after{width:100%}
 .map-section iframe{width:100%;height:420px;border:0;display:block}
 
 /* ===========================================================================
-   REDESIGN POLISH — bento, sticky headings, feature image, glass
+   REDESIGN POLISH: bento, sticky headings, feature image, glass
    =========================================================================== */
 
 /* sticky section heading (left column stays while content scrolls) */
@@ -514,12 +514,12 @@ nav.menu a[aria-current="page"]::after{width:100%}
 .feature-band p{color:rgba(255,255,255,.85);max-width:46ch;margin-top:1rem}
 
 /* ===========================================================================
-   RESPONSIVE REFINEMENTS — tablet & mobile polish
+   RESPONSIVE REFINEMENTS: tablet & mobile polish
    Placed last so equal-specificity rules win on source order.
    Tiers: ≤900 tablet · ≤640 mobile · ≤460 small phone
    =========================================================================== */
 
-/* ---- Tablet (≤900px) — nav is already the slide-in menu below this width ---- */
+/* ---- Tablet (≤900px): nav is already the slide-in menu below this width ---- */
 @media(max-width:900px){
   .hero .wrap{padding:8rem 0 3rem}
   .hero-meta{gap:1.8rem 2.4rem;margin-top:2.8rem}
@@ -565,7 +565,7 @@ nav.menu a[aria-current="page"]::after{width:100%}
   .map-lightbox img{flex:none}
   .map-card-head{padding:.85rem 1.1rem}
   .map-body{padding:1.2rem 1.2rem 1.4rem}
-  /* no hover on touch — keep the expand affordance permanently visible */
+  /* no hover on touch: keep the expand affordance permanently visible */
   .map-expand{opacity:1;transform:none}
 }
 

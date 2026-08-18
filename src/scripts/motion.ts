@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// Motion layer — Lenis smooth scroll + GSAP/ScrollTrigger choreography.
+// Motion layer: Lenis smooth scroll + GSAP/ScrollTrigger choreography.
 // Imported once from BaseLayout; the listeners below re-run setup on every
 // page (works with Astro's View Transitions / ClientRouter).
 // ---------------------------------------------------------------------------
