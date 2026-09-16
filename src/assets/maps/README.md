@@ -15,6 +15,11 @@ long-cached filename. That is why maps live here and not in `public/img/`.
 
 ## Then
 
-Add a matching entry in `src/data/maps.ts` with the exact filename in `file`,
-plus the title, description, area, year, scale and tools. The card renders
+Add a matching entry to one of the series in `src/data/maps.ts` (or start a new
+series) with the exact filename in `file`, plus the chip, label, title,
+description, key stat, extent, tags and alt text. The card renders
 automatically. A `file` with no matching image here fails the build by name.
+
+Cards sit two per row, and each row shares one frame shape taken from its
+images, so paired plates line up even when their exports differ in size. Set
+`feature: true` on a dense figure to give it a full row with the text beside it.

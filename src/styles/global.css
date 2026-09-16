@@ -334,7 +334,17 @@ nav.menu a[aria-current="page"]::after{width:100%}
 .maps-head h2{font-size:clamp(1.9rem,1.4rem + 2.4vw,3.2rem);font-weight:500;margin:1.1rem 0 1.1rem;max-width:20ch}
 .maps-head p{color:rgba(255,255,255,.78);font-size:1.05rem}
 
-/* Two per row so each pollutant's before/after pair reads as one comparison. */
+/* Series: one block per body of work, each with its own title and intro. */
+.map-series + .map-series{margin-top:clamp(3.5rem,7vw,5.5rem)}
+.map-series-head{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);gap:.9rem clamp(2rem,5vw,4rem);
+  align-items:end;padding-top:1.6rem;margin-bottom:clamp(1.6rem,3vw,2.2rem);border-top:1px solid rgba(255,255,255,.18)}
+.map-series-label{grid-column:1/-1;font-family:"Space Mono",monospace;font-size:.66rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--azure)}
+.map-series-head h3{font-family:"Space Grotesk",sans-serif;font-size:clamp(1.4rem,1.1rem + 1.2vw,2rem);font-weight:500;
+  line-height:1.15;color:#fff}
+.map-series-head p{color:rgba(255,255,255,.72);font-size:.98rem}
+
+/* Two per row so each before/after pair reads as one comparison. */
 .map-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.6rem}
 .map-card{display:flex;flex-direction:column;background:var(--band-card);
   border:1px solid rgba(255,255,255,.14);border-radius:var(--r);overflow:hidden;
@@ -354,7 +364,7 @@ nav.menu a[aria-current="page"]::after{width:100%}
 
 /* The plate. contain (not cover): the legend carries the meaning, never crop it. */
 .map-plate{display:block;position:relative;width:100%;border:0;padding:0;cursor:zoom-in;
-  background:#fff;aspect-ratio:1.414;overflow:hidden;font:inherit;color:inherit}
+  background:#fff;aspect-ratio:var(--frame,1.414);overflow:hidden;font:inherit;color:inherit}
 .map-plate img{width:100%;height:100%;object-fit:contain}
 .map-plate::after{content:"";position:absolute;inset:0;pointer-events:none;
   box-shadow:inset 0 0 0 1px rgba(0,17,41,.08);
@@ -371,7 +381,7 @@ nav.menu a[aria-current="page"]::after{width:100%}
 .map-plate:focus-visible{outline:2px solid var(--azure);outline-offset:-2px}
 
 .map-body{padding:1.4rem 1.5rem 1.6rem;display:flex;flex-direction:column;flex:1}
-.map-body h3{font-family:"Space Grotesk",sans-serif;font-size:1.12rem;font-weight:600;color:#fff;line-height:1.25}
+.map-body h4{font-family:"Space Grotesk",sans-serif;font-size:1.12rem;font-weight:600;color:#fff;line-height:1.25}
 .map-body p{color:rgba(255,255,255,.7);font-size:.93rem;margin-top:.7rem}
 .map-spec{display:flex;flex-wrap:wrap;gap:.4rem 1.1rem;margin-top:auto;padding-top:1.2rem;
   font-family:"Space Mono",monospace;font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--azure)}
@@ -381,6 +391,15 @@ nav.menu a[aria-current="page"]::after{width:100%}
 .map-tags{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.9rem}
 .map-tags span{font-family:"Space Mono",monospace;font-size:.6rem;letter-spacing:.08em;color:rgba(255,255,255,.72);
   border:1px solid rgba(255,255,255,.2);border-radius:100px;padding:.3rem .65rem}
+
+/* Feature plate: a full row, image left and text right, for dense figures that
+   need the width. Collapses back to a normal stacked card on tablet. */
+.map-card.is-feature{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);
+  grid-template-rows:auto 1fr}
+.map-card.is-feature .map-card-head{grid-column:1/-1}
+.map-card.is-feature .map-body{border-left:1px solid rgba(255,255,255,.12);padding:clamp(1.6rem,3vw,2.4rem)}
+.map-card.is-feature .map-body h4{font-size:clamp(1.2rem,1rem + .8vw,1.5rem)}
+.map-card.is-feature .map-body p{font-size:1rem}
 
 /* ---- Map lightbox ---- */
 .map-lightbox{width:min(1400px,94vw);max-width:none;max-height:92vh;padding:0;border:0;border-radius:var(--r);
@@ -531,6 +550,9 @@ nav.menu a[aria-current="page"]::after{width:100%}
   .home-intro .grid,.prose .grid,.contact-grid{grid-template-columns:1fr;gap:2.4rem}
   .svc-grid,.proj-grid,.values-grid{grid-template-columns:1fr 1fr}
   .map-grid{grid-template-columns:1fr}
+  .map-series-head{grid-template-columns:1fr;align-items:start}
+  .map-card.is-feature{display:flex}
+  .map-card.is-feature .map-body{border-left:0}
   .leaders.cols{grid-template-columns:1fr}
   .prose .grid > div:first-child .sticky,.sticky-head{position:static}
   .bento{grid-template-columns:1fr 1fr}
