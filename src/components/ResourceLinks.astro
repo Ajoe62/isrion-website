@@ -1,0 +1,56 @@
+---
+// External resources: tools and datasets published by other organisations
+// that are useful to our clients. Every card leaves the site, so each one is
+// labelled as external, names the organisation behind it and shows the host
+// it points to. Entries live in `resources` in src/data/site.ts.
+import { resources } from "../data/site";
+
+interface Props {
+  eyebrow?: string;
+  title?: string;
+  intro?: string;
+}
+const {
+  eyebrow = "External resources",
+  title = "Tools and data we point clients to.",
+  intro =
+    "Open platforms published by other organisations. These are third-party tools, not ISRION products; each link opens in a new tab.",
+} = Astro.props;
+
+// Shown under each card so visitors can see where the link goes.
+const host = (href: string) => new URL(href).host;
+---
+
+<section class="res-section" aria-label="External resources">
+  <div class="wrap">
+    <span class="eyebrow on-dark" data-reveal>{eyebrow}</span>
+    <h2 data-reveal>{title}</h2>
+    <p class="res-intro" data-reveal>{intro}</p>
+
+    <div class="res-grid">
+      {resources.map((r) => (
+        <a
+          class="res-card"
+          href={r.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          data-reveal
+        >
+          <div class="res-top">
+            <span class="res-tag">{r.tag}</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M7 17 17 7M9 7h8v8"/>
+            </svg>
+          </div>
+          <h3>{r.title}<span class="vis-hidden"> (opens in a new tab)</span></h3>
+          <p>{r.desc}</p>
+          <span class="res-host">
+            <span class="res-org">{r.org}</span>
+            <span class="res-domain">{host(r.href)}</span>
+          </span>
+        </a>
+      ))}
+    </div>
+  </div>
+</section>

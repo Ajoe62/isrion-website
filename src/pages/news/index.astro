@@ -1,0 +1,101 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageHero from "../../components/PageHero.astro";
+import ResourceLinks from "../../components/ResourceLinks.astro";
+import { Image } from "astro:assets";
+import { getCollection } from "astro:content";
+import { company } from "../../data/site";
+
+// Drafts stay visible while you run `npm run dev` and are dropped from the
+// production build.
+const items = (
+  await getCollection("news", ({ data }) => (import.meta.env.PROD ? !data.draft : true))
+).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+// "Upcoming" is resolved at build time, so rebuilding the site is what moves a
+// finished event out of the strip.
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+const upcoming = items
+  .filter((i) => i.data.eventDate && i.data.eventDate >= today)
+  .sort((a, b) => a.data.eventDate!.valueOf() - b.data.eventDate!.valueOf());
+
+const fmt = (d: Date) =>
+  new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", year: "numeric" }).format(d);
+---
+<BaseLayout
+  title={`News & Events | ${company.name}`}
+  description="Announcements, events and published work from ISRION International Ltd, covering environmental, geospatial, energy and sustainability projects across Nigeria."
+>
+  <PageHero
+    current="News & Events"
+    eyebrow="Newsroom"
+    title="What we are working on, and where to find us."
+    subtitle="Announcements, published analysis and the events, workshops and conferences our team takes part in."
+  />
+
+  <section class="news-list"><div class="wrap">
+    {upcoming.length > 0 && (
+      <div class="events-strip" data-reveal>
+        <span class="eyebrow">Upcoming</span>
+        {upcoming.map((e) => (
+          <a class="event-row" href={`/news/${e.id}/`}>
+            <span class="event-date">{fmt(e.data.eventDate!)}</span>
+            <span class="event-main">
+              <h3>{e.data.title}</h3>
+              {e.data.location && <span class="event-loc">{e.data.location}</span>}
+            </span>
+            <span class="arrow-link">Details
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </span>
+          </a>
+        ))}
+      </div>
+    )}
+
+    <div class="sec-head">
+      <div>
+        <span class="eyebrow" data-reveal>Latest</span>
+        <h2 data-reveal>News and events.</h2>
+      </div>
+    </div>
+
+    {items.length === 0 ? (
+      <p class="news-empty" data-reveal>
+        Nothing published yet. Check back soon, or <a href="/contact">get in touch</a>.
+      </p>
+    ) : (
+      <div class="proj-grid">
+        {items.map((item) => (
+          <a class="proj-card news-card" href={`/news/${item.id}/`} data-reveal>
+            <div class="thumb" data-type={item.data.type}>
+              {item.data.cover && (
+                <Image
+                  src={item.data.cover}
+                  alt={item.data.coverAlt ?? ""}
+                  width={640}
+                  widths={[480, 640]}
+                  sizes="(max-width:640px) 92vw, 33vw"
+                  format="webp"
+                  loading="lazy"
+                />
+              )}
+              <span class="chip">{item.data.type}</span>
+            </div>
+            <div class="meta">
+              <span>{fmt(item.data.date)}</span>
+              {item.data.location && <span>{item.data.location}</span>}
+            </div>
+            <h3>{item.data.title}</h3>
+            <p>{item.data.summary}</p>
+            {item.data.tags.length > 0 && (
+              <div class="tags">{item.data.tags.map((t) => <span>{t}</span>)}</div>
+            )}
+          </a>
+        ))}
+      </div>
+    )}
+  </div></section>
+
+  <ResourceLinks />
+</BaseLayout>

@@ -28,6 +28,31 @@ export const nav = [
   { label: "About Us", href: "/about" },
   { label: "Services", href: "/services" },
   { label: "Our Works", href: "/projects" },
+  { label: "News & Events", href: "/news" },
+];
+
+// ---------------------------------------------------------------------------
+// EXTERNAL RESOURCES: third-party tools and datasets we point clients to.
+// Rendered by src/components/ResourceLinks.astro. Every link opens in a new
+// tab and is labelled as external, so keep `org` accurate: these are other
+// organisations' products, not ours.
+// ---------------------------------------------------------------------------
+export type Resource = {
+  title: string;
+  org: string;
+  href: string;
+  desc: string;
+  tag: string;
+};
+
+export const resources: Resource[] = [
+  {
+    title: "Global Flood Database",
+    org: "Cloud to Street",
+    href: "https://global-flood-database.cloudtostreet.ai/#interactive-map",
+    desc: "An interactive map of satellite-observed flood events worldwide, with the flood extent, affected population and land cover for each event. Useful background for anyone assessing flood exposure at a site.",
+    tag: "Flood data",
+  },
 ];
 
 export const socials = [
