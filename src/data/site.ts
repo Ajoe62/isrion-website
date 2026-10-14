@@ -12,8 +12,8 @@ export const company = {
   address: "Flat 2, Block 59 Kubwa II, Kubwa, FCT, Nigeria",
   founded: "2025",
   tagline: "Innovative Solutions · Sustainable Futures",
-  // Used for SEO + sitemap. Change to your real domain once registered.
-  url: "https://www.isrion.com",
+  // Used for SEO + sitemap. Keep in sync with `site` in astro.config.mjs.
+  url: "https://www.isrioninternational.com",
   coords: "09.04°N · 07.36°E · Abuja, Nigeria",
   // Formspree form ID; powers the contact form on any static host (Vercel etc).
   // Create a free form at https://formspree.io and paste the ID from the

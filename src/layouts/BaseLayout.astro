@@ -27,6 +27,8 @@ const jsonLd = {
   },
   identifier: company.rc,
 };
+
+const canonical = new URL(Astro.url.pathname, Astro.site ?? company.url).href;
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -37,9 +39,11 @@ const jsonLd = {
   <meta name="description" content={description} />
   <meta name="theme-color" content="#001129" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="canonical" href={canonical} />
 
   <!-- Open Graph -->
   <meta property="og:type" content="website" />
+  <meta property="og:url" content={canonical} />
   <meta property="og:title" content={title} />
   <meta property="og:description" content={description} />
   <meta property="og:locale" content="en_NG" />

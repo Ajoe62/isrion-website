@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://www.isrion.com/sitemap-index.xml
+Sitemap: https://www.isrioninternational.com/sitemap-index.xml

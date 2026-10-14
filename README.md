@@ -1,6 +1,6 @@
 # ISRION International Ltd Website
 
-A fast, animated marketing site built with **Astro 6**, **Lenis** (smooth scroll) and **GSAP / ScrollTrigger** (scroll choreography). Static output, deploys to Netlify.
+A fast, animated marketing site built with **Astro 6**, **Lenis** (smooth scroll) and **GSAP / ScrollTrigger** (scroll choreography). Static output, deployed on Vercel.
 
 ---
 
@@ -66,29 +66,49 @@ For a blog/insights section, use Astro **Content Collections** (Markdown/MDX); s
 
 ---
 
-## Deploy to Netlify
+## Hosting overview
 
-1. Push this folder to a **GitHub** repo.
-2. In Netlify: **Add new site → Import from Git**, pick the repo.
-3. Netlify reads `netlify.toml` automatically (build `npm run build`, publish `dist`, Node 22). Click **Deploy**.
+| Piece | Provider |
+|---|---|
+| Site hosting | **Vercel** (deploys from GitHub) |
+| Domain registrar | **Truehost** (`isrioninternational.com`) |
+| DNS | **Cloudflare** (Truehost nameservers point to Cloudflare) |
+| Email | **Cloudflare Email Routing** (forwards to Gmail) |
+| Contact form | **Formspree** |
 
-Every `git push` then redeploys automatically.
+Live site: https://www.isrioninternational.com (the bare domain redirects to `www`).
+
+### Deploy (Vercel)
+The repo is connected to Vercel, which reads `vercel.json` (build `npm run build`, output `dist`, security headers). Every `git push` to `main` redeploys automatically.
+
+`netlify.toml` is kept only as a fallback config and is not in use.
+
+### Domain & DNS (Truehost → Cloudflare → Vercel)
+1. **Cloudflare:** add `isrioninternational.com` on the Free plan and note the two nameservers it assigns.
+2. **Truehost:** under the domain's **Nameservers**, switch to custom nameservers and enter Cloudflare's two (turn DNSSEC off first if it is on).
+3. **Vercel:** in the project, **Settings → Domains**, add `www.isrioninternational.com` (primary) and `isrioninternational.com` (redirects to www).
+4. **Cloudflare DNS records** (use the values Vercel shows if they differ):
+
+   | Type | Name | Value | Proxy |
+   |---|---|---|---|
+   | A | `@` | `76.76.21.21` | DNS only |
+   | CNAME | `www` | `cname.vercel-dns.com` | DNS only |
+
+   Keep these grey-clouded (DNS only) so Vercel issues and renews the SSL certificate. If you ever proxy them (orange cloud), set Cloudflare **SSL/TLS** to **Full (strict)** to avoid a redirect loop.
+
+If the domain ever changes, update all three of: `site` in `astro.config.mjs`, `company.url` in `src/data/site.ts` and the `Sitemap:` line in `public/robots.txt`.
+
+### Email (Cloudflare Email Routing)
+Free, receive-only forwarding: mail to addresses like `info@isrioninternational.com` is forwarded to `isrioninternational@gmail.com`. Cloudflare does not store mail or send it.
+
+1. Cloudflare: **Email → Email Routing → Get started**.
+2. Add the Gmail address as a destination and confirm the verification email.
+3. Create the custom addresses (e.g. `info@`) and let Cloudflare add its MX and SPF records automatically.
+
+To *send* as `info@isrioninternational.com` from Gmail, add an SMTP relay (e.g. Brevo's free tier) under Gmail **Settings → Accounts → Send mail as**.
 
 ### Contact form
-The contact form in `CTA.astro` uses **Netlify Forms** (no backend). It only processes submissions once deployed to Netlify; submissions appear under **Forms** in your Netlify dashboard. Locally the form renders but won't send.
-
-### Custom domain & email
-Add your domain in Netlify under **Domain settings**. Then update two places to your real domain:
-- `site` in `astro.config.mjs`
-- the `Sitemap:` line in `public/robots.txt`
-
-For professional email (e.g. `info@isrion.com`), use Zoho Mail (free tier) or Google Workspace.
-
----
-
-## Switching to Cloudflare Pages later (optional)
-
-Astro is now maintained by Cloudflare and deploys there just as easily. In Cloudflare Pages, set the build command to `npm run build` and the output directory to `dist`. You'd replace Netlify Forms with Formspree or a Cloudflare Worker for the contact form.
+`ContactForm.astro` posts to **Formspree** (no backend, works on any host). The form ID lives in `company.formspreeId` in `src/data/site.ts`; submissions arrive by email and in the Formspree dashboard.
 
 ---
 
@@ -96,6 +116,8 @@ Astro is now maintained by Cloudflare and deploys there just as easily. In Cloud
 - [ ] Swap the placeholder `I` logo mark for the real ISRION logo (in `Nav.astro`, `Footer.astro`, and `public/favicon.svg`).
 - [ ] Add real, licensed photography (don't reuse the stock images embedded in the PDF; those are licensed to someone else).
 - [ ] Add real social links in `Footer.astro`.
-- [ ] Register the domain and set up domain email.
-- [ ] Update `site` in `astro.config.mjs` to the real domain.
+- [x] Register the domain (`isrioninternational.com`).
+- [x] Update `site` in `astro.config.mjs` to the real domain.
+- [ ] Point DNS through Cloudflare to Vercel and confirm HTTPS on both `www` and the bare domain.
+- [ ] Set up Cloudflare Email Routing, then switch `company.email` in `src/data/site.ts` to `info@isrioninternational.com`.
 ```
