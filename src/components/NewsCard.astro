@@ -1,0 +1,40 @@
+---
+// One article card for the /news grid and the "keep reading" row on articles.
+// Without a cover image the thumbnail falls back to a contour-pattern gradient
+// tinted by category, so a text-only post still looks deliberate.
+import { Image } from "astro:assets";
+import { fmtDate, isoDay, readingTime, type Post } from "../lib/content";
+
+interface Props { post: Post; }
+const { post } = Astro.props;
+const d = post.data;
+---
+<a class="post-card" href={`/news/${post.id}/`} data-category={d.category} data-reveal>
+  <div class="post-thumb" data-category={d.category}>
+    {d.cover ? (
+      <Image
+        src={d.cover}
+        alt=""
+        width={720}
+        widths={[480, 720]}
+        sizes="(max-width:640px) 92vw, (max-width:900px) 45vw, 30vw"
+        format="webp"
+        loading="lazy"
+      />
+    ) : (
+      <span class="post-thumb-mark" aria-hidden="true">{d.category}</span>
+    )}
+    <span class="chip">{d.category}</span>
+  </div>
+  <div class="post-body">
+    <div class="post-meta">
+      <time datetime={isoDay(d.date)}>{fmtDate(d.date)}</time>
+      <span>{readingTime(post.body)} min read</span>
+    </div>
+    <h3>{d.title}</h3>
+    <p>{d.summary}</p>
+    <span class="arrow-link">Read article
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </span>
+  </div>
+</a>

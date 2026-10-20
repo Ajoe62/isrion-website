@@ -1,0 +1,30 @@
+---
+// A dated row for an upcoming event: calendar tile, title, key facts.
+// The tile is decorative (aria-hidden); the full date is in the facts line.
+import { dateParts, fmtRange, isoDay, type Event } from "../lib/content";
+
+interface Props { event: Event; }
+const { event } = Astro.props;
+const d = event.data;
+const tile = dateParts(d.startDate);
+---
+<a class="ev-row" href={`/events/${event.id}/`} data-reveal>
+  <span class="ev-tile" aria-hidden="true">
+    <span class="m">{tile.m}</span><span class="d">{tile.d}</span><span class="y">{tile.y}</span>
+  </span>
+  <span class="ev-row-main">
+    <span class="ev-kicker">
+      <span>{d.category}</span><span>{d.format}</span>{d.role && <span>{d.role}</span>}
+    </span>
+    <h3>{d.title}</h3>
+    <span class="ev-row-facts">
+      <time datetime={isoDay(d.startDate)}>{fmtRange(d.startDate, d.endDate)}</time>
+      <span>{d.location}</span>
+      <span class="ev-countdown is-inline" data-countdown data-start={isoDay(d.startDate)}
+        data-end={isoDay(d.endDate ?? d.startDate)}></span>
+    </span>
+  </span>
+  <span class="arrow-link">Details
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+  </span>
+</a>

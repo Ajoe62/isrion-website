@@ -28,7 +28,8 @@ export const nav = [
   { label: "About Us", href: "/about" },
   { label: "Services", href: "/services" },
   { label: "Our Works", href: "/projects" },
-  { label: "News & Events", href: "/news" },
+  { label: "News", href: "/news" },
+  { label: "Events", href: "/events" },
 ];
 
 // ---------------------------------------------------------------------------

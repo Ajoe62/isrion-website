@@ -5,9 +5,16 @@ import Nav from "../components/Nav.astro";
 import Footer from "../components/Footer.astro";
 import "../styles/global.css";
 
-interface Props { title?: string; description?: string; }
+interface Props {
+  title?: string;
+  description?: string;
+  ogType?: "website" | "article";
+  image?: string; // absolute URL for og:image / twitter:image
+}
 const {
   title = `${company.name} | Innovative Solutions. Sustainable Futures.`,
+  ogType = "website",
+  image,
   description = "ISRION International Ltd is a Nigeria-based multidisciplinary consulting, technology, engineering and sustainability firm providing environmental, geospatial, renewable energy, engineering, ESG and research services.",
 } = Astro.props;
 
@@ -42,12 +49,14 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? company.url).href;
   <link rel="canonical" href={canonical} />
 
   <!-- Open Graph -->
-  <meta property="og:type" content="website" />
+  <meta property="og:type" content={ogType} />
   <meta property="og:url" content={canonical} />
   <meta property="og:title" content={title} />
   <meta property="og:description" content={description} />
   <meta property="og:locale" content="en_NG" />
+  {image && <meta property="og:image" content={image} />}
   <meta name="twitter:card" content="summary_large_image" />
+  {image && <meta name="twitter:image" content={image} />}
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />

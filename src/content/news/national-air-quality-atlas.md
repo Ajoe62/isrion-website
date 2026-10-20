@@ -1,7 +1,9 @@
 ---
 title: "A national air quality atlas: methane, nitrogen dioxide and PM2.5"
 date: 2026-08-18
-type: "News"
+category: "Research"
+cover: "../../assets/maps/NO2_2025.png"
+coverAlt: "Map of Nigeria showing annual mean tropospheric nitrogen dioxide in 2025, with maxima over Lagos and Ogun, Abuja, Kano and Port Harcourt."
 summary: "Annual mean concentrations of three atmospheric pollutants mapped across Nigeria below state level and paired across years, so change is visible at a glance."
 tags: ["Air quality", "Remote sensing", "Nigeria"]
 ---

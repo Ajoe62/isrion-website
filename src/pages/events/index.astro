@@ -1,0 +1,190 @@
+---
+// The events calendar: the next event featured, later ones as dated rows,
+// then a year-by-year archive. Events live in src/content/events/.
+// Upcoming vs past is resolved at build time, so a rebuild is what moves a
+// finished event into the archive; countdown badges update in the browser.
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageHero from "../../components/PageHero.astro";
+import EventRow from "../../components/EventRow.astro";
+import { company } from "../../data/site";
+import { calendarUrl, dateParts, fmtDate, fmtRange, getEvents, isoDay } from "../../lib/content";
+
+const { upcoming, past } = await getEvents();
+const [next, ...later] = upcoming;
+const tile = next && dateParts(next.data.startDate);
+
+const pastByYear = Object.entries(
+  Object.groupBy(past, (e) => String(e.data.startDate.getUTCFullYear())),
+).sort(([a], [b]) => Number(b) - Number(a));
+
+// The formats we take part in: shown whether or not anything is scheduled,
+// so the page still tells an organiser what to invite us for.
+const formats = [
+  {
+    title: "Workshops & training",
+    body: "Hands-on sessions in GIS, remote sensing and environmental assessment, built around your team's own data and questions.",
+  },
+  {
+    title: "Conferences & panels",
+    body: "Talks and panel contributions on environmental monitoring, climate risk, energy transition and ESG practice in Nigeria.",
+  },
+  {
+    title: "Webinars & briefings",
+    body: "Focused online briefings that walk decision-makers through findings, maps and what they mean for policy or investment.",
+  },
+  {
+    title: "Stakeholder sessions",
+    body: "Community and stakeholder engagement alongside assessments, so the people affected understand and shape the work.",
+  },
+];
+---
+<BaseLayout
+  title={`Events | ${company.name}`}
+  description="Workshops, conferences, training and briefings hosted or attended by ISRION International Ltd, covering geospatial, environmental, energy and ESG practice in Nigeria."
+>
+  <PageHero
+    current="Events"
+    eyebrow="Events"
+    title="Where to meet the ISRION team."
+    subtitle="Workshops, conferences, training sessions and briefings we host or take part in, from geospatial analysis to environmental and ESG practice."
+    image="/img/feature-office.jpg"
+  />
+
+  <section class="listing"><div class="wrap">
+    <div class="sec-head">
+      <div>
+        <span class="eyebrow" data-reveal>Upcoming</span>
+        <h2 data-reveal>{next ? "On the calendar." : "Nothing scheduled, yet."}</h2>
+      </div>
+      {upcoming.length > 0 && (
+        <span class="sec-count" data-reveal>{upcoming.length} upcoming event{upcoming.length === 1 ? "" : "s"}</span>
+      )}
+    </div>
+
+    {next ? (
+      <article class="ev-feature" data-reveal>
+        <div class="ev-feature-date">
+          <div>
+            <span class="ev-big-m">{tile!.m} {tile!.y}</span>
+            <span class="ev-big-d" aria-hidden="true">{tile!.d}</span>
+          </div>
+          <span class="ev-countdown" data-countdown data-start={isoDay(next.data.startDate)}
+            data-end={isoDay(next.data.endDate ?? next.data.startDate)}></span>
+        </div>
+        <div class="ev-feature-body">
+          <span class="ev-kicker">
+            <span>Next event</span><span>{next.data.category}</span>
+          </span>
+          <h3><a href={`/events/${next.id}/`}>{next.data.title}</a></h3>
+          <p>{next.data.summary}</p>
+          <dl class="ev-facts">
+            <div><dt>Date</dt><dd><time datetime={isoDay(next.data.startDate)}>{fmtRange(next.data.startDate, next.data.endDate)}</time></dd></div>
+            {next.data.time && <div><dt>Time</dt><dd>{next.data.time}</dd></div>}
+            <div><dt>Where</dt><dd>{[next.data.venue, next.data.location].filter(Boolean).join(", ")}</dd></div>
+            <div><dt>Format</dt><dd>{next.data.format}</dd></div>
+            {next.data.role && <div><dt>Our role</dt><dd>{next.data.role}</dd></div>}
+          </dl>
+          <div class="ev-actions">
+            {next.data.registration && (
+              <a class="btn btn-primary" href={next.data.registration.href} target="_blank" rel="noopener noreferrer">
+                {next.data.registration.label}<span class="vis-hidden"> (opens in a new tab)</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>
+              </a>
+            )}
+            <a class="btn btn-ghost" href={`/events/${next.id}/`}>Event details</a>
+            <a class="arrow-link" href={calendarUrl(next)} target="_blank" rel="noopener noreferrer">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16v14H4zM4 10h16M9 3v4M15 3v4M12 13v5M9.5 15.5h5"/></svg>
+              Add to calendar<span class="vis-hidden"> (opens Google Calendar in a new tab)</span>
+            </a>
+          </div>
+        </div>
+      </article>
+    ) : (
+      <div class="empty-state" data-reveal>
+        <span class="empty-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16v14H4zM4 10h16M9 3v4M15 3v4M8.5 14h.01M12 14h.01M15.5 14h.01M8.5 17h.01M12 17h.01"/></svg>
+        </span>
+        <div>
+          <h3>No public events are scheduled right now.</h3>
+          <p>
+            New workshops, talks and briefings are listed here as soon as they are confirmed.
+            Organising something yourself? We are glad to speak, run a training session or join a panel.
+          </p>
+          <div class="btns">
+            <a class="btn btn-primary" href="/contact">Invite us to your event
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+            <a class="btn btn-ghost" href="/news">Read our latest news</a>
+          </div>
+        </div>
+      </div>
+    )}
+
+    {later.length > 0 && (
+      <div class="ev-list">
+        {later.map((e) => <EventRow event={e} />)}
+      </div>
+    )}
+  </div></section>
+
+  <section class="values-section"><div class="wrap">
+    <div class="formats-head">
+      <div>
+        <span class="eyebrow" data-reveal>Bring us in</span>
+        <h2 data-reveal>What we bring to an event.</h2>
+        <p data-reveal>We take part where evidence meets decisions: sharing methods, data and lessons from our environmental, geospatial and sustainability work.</p>
+      </div>
+      <a class="btn btn-primary" href="/contact" data-reveal>Invite ISRION
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    </div>
+    <div class="values-grid">
+      {formats.map((f, i) => (
+        <div class="value-card format-card" data-reveal>
+          <span class="format-idx">{String(i + 1).padStart(2, "0")}</span>
+          <h4>{f.title}</h4>
+          <p>{f.body}</p>
+        </div>
+      ))}
+    </div>
+  </div></section>
+
+  {pastByYear.length > 0 && (
+    <section class="listing alt"><div class="wrap">
+      <div class="sec-head">
+        <div>
+          <span class="eyebrow" data-reveal>Archive</span>
+          <h2 data-reveal>Past events.</h2>
+        </div>
+      </div>
+      <div class="ev-archive">
+        {pastByYear.map(([year, list]) => (
+          <div class="ev-year" data-reveal>
+            <h3>{year}</h3>
+            <ul>
+              {list!.map((e) => (
+                <li>
+                  <a class="ev-past" href={`/events/${e.id}/`}>
+                    <time datetime={isoDay(e.data.startDate)}>{fmtDate(e.data.startDate, { day: "numeric", month: "short" })}</time>
+                    <span class="ev-past-main">
+                      <h4>{e.data.title}</h4>
+                      <span class="loc">{e.data.category} · {e.data.location}</span>
+                    </span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </div></section>
+  )}
+
+  <section class="home-cta"><div class="wrap">
+    <h2 data-reveal>Planning an event in our field?</h2>
+    <p data-reveal>Tell us the audience and the theme, and we'll suggest a talk, workshop or briefing that fits.</p>
+    <a href="/contact" class="btn btn-primary" data-reveal>Contact us
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+  </div></section>
+</BaseLayout>
+
+<script>import "../../scripts/newsroom.ts";</script>

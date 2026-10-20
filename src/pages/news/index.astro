@@ -1,101 +1,118 @@
 ---
+// The newsroom: a featured story, then every other article in a filterable grid.
+// Articles live in src/content/news/ (see src/content.config.ts).
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import PageHero from "../../components/PageHero.astro";
+import NewsCard from "../../components/NewsCard.astro";
 import ResourceLinks from "../../components/ResourceLinks.astro";
 import { Image } from "astro:assets";
-import { getCollection } from "astro:content";
 import { company } from "../../data/site";
+import { fmtDate, getPosts, isoDay, readingTime } from "../../lib/content";
 
-// Drafts stay visible while you run `npm run dev` and are dropped from the
-// production build.
-const items = (
-  await getCollection("news", ({ data }) => (import.meta.env.PROD ? !data.draft : true))
-).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const posts = await getPosts();
+const featured = posts.find((p) => p.data.featured) ?? posts[0];
+const rest = posts.filter((p) => p !== featured);
 
-// "Upcoming" is resolved at build time, so rebuilding the site is what moves a
-// finished event out of the strip.
-const today = new Date();
-today.setHours(0, 0, 0, 0);
-const upcoming = items
-  .filter((i) => i.data.eventDate && i.data.eventDate >= today)
-  .sort((a, b) => a.data.eventDate!.valueOf() - b.data.eventDate!.valueOf());
-
-const fmt = (d: Date) =>
-  new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", year: "numeric" }).format(d);
+// Filter chips only earn their place when the grid mixes categories.
+const categories = [...new Set(rest.map((p) => p.data.category))];
+const count = (c: string) => rest.filter((p) => p.data.category === c).length;
 ---
 <BaseLayout
-  title={`News & Events | ${company.name}`}
-  description="Announcements, events and published work from ISRION International Ltd, covering environmental, geospatial, energy and sustainability projects across Nigeria."
+  title={`News | ${company.name}`}
+  description="News, research findings and published analysis from ISRION International Ltd, covering environmental, geospatial, energy and sustainability work across Nigeria."
 >
   <PageHero
-    current="News & Events"
+    current="News"
     eyebrow="Newsroom"
-    title="What we are working on, and where to find us."
-    subtitle="Announcements, published analysis and the events, workshops and conferences our team takes part in."
+    title="Evidence from the field, the lab and the map."
+    subtitle="Announcements, research findings and published analysis from our environmental, geospatial, energy and sustainability work across Nigeria."
   />
 
-  <section class="news-list"><div class="wrap">
-    {upcoming.length > 0 && (
-      <div class="events-strip" data-reveal>
-        <span class="eyebrow">Upcoming</span>
-        {upcoming.map((e) => (
-          <a class="event-row" href={`/news/${e.id}/`}>
-            <span class="event-date">{fmt(e.data.eventDate!)}</span>
-            <span class="event-main">
-              <h3>{e.data.title}</h3>
-              {e.data.location && <span class="event-loc">{e.data.location}</span>}
-            </span>
-            <span class="arrow-link">Details
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-            </span>
-          </a>
-        ))}
+  <section class="listing"><div class="wrap">
+    {featured ? (
+      <a class="post-feature" href={`/news/${featured.id}/`} data-reveal>
+        <div class="post-thumb" data-category={featured.data.category}>
+          {featured.data.cover ? (
+            <Image
+              src={featured.data.cover}
+              alt={featured.data.coverAlt ?? ""}
+              width={1100}
+              widths={[640, 900, 1100]}
+              sizes="(max-width:900px) 92vw, 680px"
+              format="webp"
+              loading="eager"
+            />
+          ) : (
+            <span class="post-thumb-mark" aria-hidden="true">{featured.data.category}</span>
+          )}
+          <span class="chip">Featured</span>
+        </div>
+        <div class="post-feature-body">
+          <div class="post-meta">
+            <span>{featured.data.category}</span>
+            <time datetime={isoDay(featured.data.date)}>{fmtDate(featured.data.date)}</time>
+            <span>{readingTime(featured.body)} min read</span>
+          </div>
+          <h2>{featured.data.title}</h2>
+          <p>{featured.data.summary}</p>
+          <span class="btn btn-primary">Read the article
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </span>
+        </div>
+      </a>
+    ) : (
+      <div class="empty-state" data-reveal>
+        <span class="empty-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h13v14H6a2 2 0 0 1-2-2zM17 9h3v8a2 2 0 0 1-2 2M8 9h5M8 13h5"/></svg>
+        </span>
+        <div>
+          <h3>The first stories are on their way.</h3>
+          <p>We are preparing write-ups of our recent work. In the meantime, browse the maps and projects behind them.</p>
+          <div class="btns">
+            <a class="btn btn-primary" href="/projects">See our works
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+            <a class="btn btn-ghost" href="/contact">Get in touch</a>
+          </div>
+        </div>
       </div>
     )}
 
-    <div class="sec-head">
-      <div>
-        <span class="eyebrow" data-reveal>Latest</span>
-        <h2 data-reveal>News and events.</h2>
-      </div>
-    </div>
-
-    {items.length === 0 ? (
-      <p class="news-empty" data-reveal>
-        Nothing published yet. Check back soon, or <a href="/contact">get in touch</a>.
-      </p>
-    ) : (
-      <div class="proj-grid">
-        {items.map((item) => (
-          <a class="proj-card news-card" href={`/news/${item.id}/`} data-reveal>
-            <div class="thumb" data-type={item.data.type}>
-              {item.data.cover && (
-                <Image
-                  src={item.data.cover}
-                  alt={item.data.coverAlt ?? ""}
-                  width={640}
-                  widths={[480, 640]}
-                  sizes="(max-width:640px) 92vw, 33vw"
-                  format="webp"
-                  loading="lazy"
-                />
-              )}
-              <span class="chip">{item.data.type}</span>
+    {rest.length > 0 && (
+      <div class="listing-block">
+        <div class="sec-head">
+          <div>
+            <span class="eyebrow" data-reveal>Latest</span>
+            <h2 data-reveal>More from the newsroom.</h2>
+          </div>
+          {categories.length > 1 && (
+            <div class="filter-bar" data-filter-bar role="group" aria-label="Filter articles by category" data-reveal>
+              <button type="button" class="filter-chip" data-filter="all" aria-pressed="true">
+                All <span class="n">{rest.length}</span>
+              </button>
+              {categories.map((c) => (
+                <button type="button" class="filter-chip" data-filter={c} aria-pressed="false">
+                  {c} <span class="n">{count(c)}</span>
+                </button>
+              ))}
             </div>
-            <div class="meta">
-              <span>{fmt(item.data.date)}</span>
-              {item.data.location && <span>{item.data.location}</span>}
-            </div>
-            <h3>{item.data.title}</h3>
-            <p>{item.data.summary}</p>
-            {item.data.tags.length > 0 && (
-              <div class="tags">{item.data.tags.map((t) => <span>{t}</span>)}</div>
-            )}
-          </a>
-        ))}
+          )}
+        </div>
+        <div class="post-grid" data-items={rest.length} data-filter-grid>
+          {rest.map((p) => <NewsCard post={p} />)}
+        </div>
+        <p class="vis-hidden" data-filter-status aria-live="polite"></p>
       </div>
     )}
   </div></section>
 
   <ResourceLinks />
+
+  <section class="home-cta"><div class="wrap">
+    <h2 data-reveal>Need this kind of evidence for your project?</h2>
+    <p data-reveal>Tell us the question you need answered and we will outline the data, methods and deliverables to answer it.</p>
+    <a href="/contact" class="btn btn-primary" data-reveal>Start a conversation
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+  </div></section>
 </BaseLayout>
+
+<script>import "../../scripts/newsroom.ts";</script>

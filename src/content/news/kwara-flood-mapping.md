@@ -1,7 +1,9 @@
 ---
 title: "Radar flood mapping for five dam releases in Kwara State"
 date: 2026-09-15
-type: "News"
+category: "Research"
+cover: "../../assets/maps/KWARA_FLOOD_2.jpg"
+coverAlt: "Bar chart and LGA grid showing population exposed to each of five dam-induced flood events in Kwara State, peaking at 24,822 people in September 2022."
 summary: "Sentinel-1 radar maps of five dam-induced flood events on the River Niger between 2018 and 2025, with flooded cropland and population exposure measured for each event."
 tags: ["Flood mapping", "Sentinel-1 SAR", "Kwara State"]
 ---

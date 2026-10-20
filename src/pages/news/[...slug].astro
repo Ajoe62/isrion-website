@@ -3,74 +3,142 @@
 // URL, so news/kwara-flood-mapping.md is served at /news/kwara-flood-mapping/.
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import PageHero from "../../components/PageHero.astro";
-import { Image } from "astro:assets";
-import { getCollection, render, type CollectionEntry } from "astro:content";
+import NewsCard from "../../components/NewsCard.astro";
+import ShareLinks from "../../components/ShareLinks.astro";
+import { Image, getImage } from "astro:assets";
+import { render } from "astro:content";
 import { company } from "../../data/site";
+import { fmtDate, getPosts, isoDay, readingTime, type Post } from "../../lib/content";
 
 export async function getStaticPaths() {
-  const items = await getCollection("news", ({ data }) =>
-    import.meta.env.PROD ? !data.draft : true,
-  );
-  return items.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+  const posts = await getPosts();
+  return posts.map((entry) => ({ params: { slug: entry.id }, props: { entry, posts } }));
 }
 
-type Props = { entry: CollectionEntry<"news"> };
-const { entry } = Astro.props;
+type Props = { entry: Post; posts: Post[] };
+const { entry, posts } = Astro.props;
+const d = entry.data;
 const { Content } = await render(entry);
 
-const fmt = (d: Date) =>
-  new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", year: "numeric" }).format(d);
+const url = new URL(Astro.url.pathname, Astro.site ?? company.url).href;
+const ogImage = d.cover
+  ? new URL((await getImage({ src: d.cover, width: 1200, format: "jpg" })).src, url).href
+  : undefined;
+
+// Same category first, then the most recent of the rest.
+const others = posts.filter((p) => p.id !== entry.id);
+const related = [
+  ...others.filter((p) => p.data.category === d.category),
+  ...others.filter((p) => p.data.category !== d.category),
+].slice(0, 3);
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  headline: d.title,
+  description: d.summary,
+  datePublished: isoDay(d.date),
+  author: { "@type": "Organization", name: d.author === "ISRION team" ? company.name : d.author },
+  publisher: { "@type": "Organization", name: company.name, url: company.url },
+  mainEntityOfPage: url,
+  keywords: d.tags.join(", ") || undefined,
+  image: ogImage,
+};
 ---
-<BaseLayout title={`${entry.data.title} | ${company.name}`} description={entry.data.summary}>
+<BaseLayout title={`${d.title} | ${company.name}`} description={d.summary} ogType="article" image={ogImage}>
   <PageHero
-    current="News & Events"
-    eyebrow={entry.data.type}
-    title={entry.data.title}
-    subtitle={entry.data.summary}
+    parent={{ label: "News", href: "/news" }}
+    current={d.title}
+    eyebrow={d.category}
+    title={d.title}
+    subtitle={d.summary}
   />
 
-  <section class="article-section"><div class="wrap">
-    <div class="article-meta" data-reveal>
-      <span>{fmt(entry.data.date)}</span>
-      {entry.data.eventDate && <span>Event: {fmt(entry.data.eventDate)}</span>}
-      {entry.data.location && <span>{entry.data.location}</span>}
-      {entry.data.tags.map((t) => <span>{t}</span>)}
-    </div>
+  <section class="article-section"><div class="wrap article-layout">
+    <article class="article-main">
+      <div class="byline" data-reveal>
+        <span class="mark" aria-hidden="true">I</span>
+        <div>
+          <b>{d.author}</b>
+          <span>
+            <time datetime={isoDay(d.date)}>{fmtDate(d.date)}</time>
+            <span aria-hidden="true"> · </span>{readingTime(entry.body)} min read
+          </span>
+        </div>
+      </div>
 
-    {entry.data.cover && (
-      <figure class="article-cover" data-reveal>
-        <Image
-          src={entry.data.cover}
-          alt={entry.data.coverAlt ?? ""}
-          width={1240}
-          widths={[640, 960, 1240]}
-          sizes="(max-width:900px) 92vw, 1240px"
-          format="webp"
-          loading="eager"
-        />
-      </figure>
-    )}
-
-    <div class="article-body" data-reveal><Content /></div>
-
-    <div class="article-foot" data-reveal>
-      <a class="arrow-link" href="/news">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform:rotate(180deg)"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-        All news and events
-      </a>
-      {entry.data.external && (
-        <a class="btn btn-ghost" href={entry.data.external.href} target="_blank" rel="noopener noreferrer">
-          {entry.data.external.label}<span class="vis-hidden"> (opens in a new tab)</span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>
-        </a>
+      {d.cover && (
+        <figure class="article-cover" data-reveal>
+          <Image
+            src={d.cover}
+            alt={d.coverAlt ?? ""}
+            width={1100}
+            widths={[640, 900, 1100, 1600]}
+            sizes="(max-width:900px) 92vw, 860px"
+            format="webp"
+            loading="eager"
+          />
+        </figure>
       )}
-    </div>
+
+      <div class="article-body" data-reveal><Content /></div>
+
+      {d.tags.length > 0 && (
+        <ul class="article-tags" aria-label="Topics" data-reveal>
+          {d.tags.map((t) => <li>{t}</li>)}
+        </ul>
+      )}
+
+      <div class="article-foot" data-reveal>
+        <a class="arrow-link" href="/news">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform:rotate(180deg)" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          All news
+        </a>
+        {d.external && (
+          <a class="btn btn-ghost" href={d.external.href} target="_blank" rel="noopener noreferrer">
+            {d.external.label}<span class="vis-hidden"> (opens in a new tab)</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>
+          </a>
+        )}
+      </div>
+    </article>
+
+    <aside class="article-aside" aria-label="Share and contact">
+      <div class="aside-card">
+        <h4>Share this article</h4>
+        <ShareLinks url={url} title={d.title} />
+      </div>
+      <div class="aside-card dark">
+        <h4>Work with us</h4>
+        <p>We can run this kind of analysis for your site, state or programme.</p>
+        <a class="arrow-link on-dark" href="/contact">Discuss a project
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+    </aside>
   </div></section>
+
+  {related.length > 0 && (
+    <section class="listing alt"><div class="wrap">
+      <div class="sec-head">
+        <div>
+          <span class="eyebrow" data-reveal>Keep reading</span>
+          <h2 data-reveal>More from the newsroom.</h2>
+        </div>
+        <a class="arrow-link" href="/news" data-reveal>All news
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+      <div class="post-grid" data-items={related.length}>{related.map((p) => <NewsCard post={p} />)}</div>
+    </div></section>
+  )}
 
   <section class="home-cta"><div class="wrap">
     <h2 data-reveal>Working on something similar?</h2>
     <p data-reveal>Tell us about your project and we'll outline how we would approach it.</p>
     <a href="/contact" class="btn btn-primary" data-reveal>Contact us
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
   </div></section>
+
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 </BaseLayout>
+
+<script>import "../../scripts/newsroom.ts";</script>

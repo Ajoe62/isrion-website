@@ -7,9 +7,10 @@ interface Props {
   title: string;
   subtitle?: string;
   current: string; // breadcrumb label for the current page
+  parent?: { label: string; href: string }; // optional middle crumb, e.g. News
   image?: string;  // optional background image (under the gradient overlay)
 }
-const { eyebrow, title, subtitle, current, image } = Astro.props;
+const { eyebrow, title, subtitle, current, parent, image } = Astro.props;
 ---
 <section class="page-hero" class:list={{ "has-img": image }}>
   {image && (
@@ -22,7 +23,9 @@ const { eyebrow, title, subtitle, current, image } = Astro.props;
   <div class="grain" aria-hidden="true"></div>
   <div class="wrap on-dark">
     <nav class="crumb" aria-label="Breadcrumb" data-reveal>
-      <a href="/">Home</a><span aria-hidden="true">/</span><span>{current}</span>
+      <a href="/">Home</a><span aria-hidden="true">/</span>
+      {parent && <><a href={parent.href}>{parent.label}</a><span aria-hidden="true">/</span></>}
+      <span aria-current="page">{current}</span>
     </nav>
     <span class="eyebrow on-dark" data-reveal>{eyebrow}</span>
     <h1 data-reveal>{title}</h1>

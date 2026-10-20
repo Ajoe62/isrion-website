@@ -1,0 +1,162 @@
+---
+// One page per Markdown file in src/content/events/. The filename becomes the
+// URL, so events/geospatial-workshop.md is served at /events/geospatial-workshop/.
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageHero from "../../components/PageHero.astro";
+import EventRow from "../../components/EventRow.astro";
+import ShareLinks from "../../components/ShareLinks.astro";
+import { Image, getImage } from "astro:assets";
+import { render } from "astro:content";
+import { company } from "../../data/site";
+import {
+  calendarUrl, fmtRange, getAllEvents, getEvents, hasEnded, isoDay, type Event,
+} from "../../lib/content";
+
+export async function getStaticPaths() {
+  const events = await getAllEvents();
+  return events.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+type Props = { entry: Event };
+const { entry } = Astro.props;
+const d = entry.data;
+const { Content } = await render(entry);
+const ended = hasEnded(entry);
+const end = d.endDate ?? d.startDate;
+const where = [d.venue, d.location].filter(Boolean).join(", ");
+
+const { upcoming } = await getEvents();
+const more = upcoming.filter((e) => e.id !== entry.id).slice(0, 3);
+
+const url = new URL(Astro.url.pathname, Astro.site ?? company.url).href;
+const ogImage = d.cover
+  ? new URL((await getImage({ src: d.cover, width: 1200, format: "jpg" })).src, url).href
+  : undefined;
+
+const mode = {
+  "In person": "OfflineEventAttendanceMode",
+  Online: "OnlineEventAttendanceMode",
+  Hybrid: "MixedEventAttendanceMode",
+}[d.format];
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Event",
+  name: d.title,
+  description: d.summary,
+  startDate: isoDay(d.startDate),
+  endDate: isoDay(end),
+  eventStatus: "https://schema.org/EventScheduled",
+  eventAttendanceMode: `https://schema.org/${mode}`,
+  location:
+    d.format === "Online"
+      ? { "@type": "VirtualLocation", url: d.registration?.href ?? url }
+      : { "@type": "Place", name: d.venue ?? d.location, address: d.location },
+  organizer: d.role === "Hosting" ? { "@type": "Organization", name: company.name, url: company.url } : undefined,
+  url,
+  image: ogImage,
+};
+---
+<BaseLayout title={`${d.title} | Events | ${company.name}`} description={d.summary} image={ogImage}>
+  <PageHero
+    parent={{ label: "Events", href: "/events" }}
+    current={d.title}
+    eyebrow={`${d.category} · ${fmtRange(d.startDate, d.endDate)}`}
+    title={d.title}
+    subtitle={d.summary}
+  />
+
+  <section class="article-section"><div class="wrap article-layout is-event" data-event-end={isoDay(end)}>
+    <article class="article-main">
+      {d.cover && (
+        <figure class="article-cover is-first" data-reveal>
+          <Image
+            src={d.cover}
+            alt={d.coverAlt ?? ""}
+            width={1100}
+            widths={[640, 900, 1100, 1600]}
+            sizes="(max-width:900px) 92vw, 860px"
+            format="webp"
+            loading="eager"
+          />
+        </figure>
+      )}
+
+      <div class="article-body is-first" data-reveal><Content /></div>
+
+      {d.tags.length > 0 && (
+        <ul class="article-tags" aria-label="Topics" data-reveal>
+          {d.tags.map((t) => <li>{t}</li>)}
+        </ul>
+      )}
+
+      <div class="article-foot" data-reveal>
+        <a class="arrow-link" href="/events">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform:rotate(180deg)" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          All events
+        </a>
+      </div>
+    </article>
+
+    <aside class="article-aside" aria-label="Event details">
+      <div class="ev-card">
+        <div class="ev-card-head">
+          <h4>Event details</h4>
+          {ended ? (
+            <span class="ev-countdown" data-state="past">Event ended</span>
+          ) : (
+            <span class="ev-countdown" data-countdown data-start={isoDay(d.startDate)} data-end={isoDay(end)}></span>
+          )}
+        </div>
+        <dl>
+          <div><dt>Date</dt><dd><time datetime={isoDay(d.startDate)}>{fmtRange(d.startDate, d.endDate)}</time></dd></div>
+          {d.time && <div><dt>Time</dt><dd>{d.time}</dd></div>}
+          <div><dt>Where</dt><dd>{where}</dd></div>
+          <div><dt>Format</dt><dd>{d.format}</dd></div>
+          {d.role && <div><dt>Our role</dt><dd>{d.role}</dd></div>}
+        </dl>
+        {!ended && (
+          <div class="ev-card-actions" data-upcoming-only>
+            {d.registration && (
+              <a class="btn btn-primary" href={d.registration.href} target="_blank" rel="noopener noreferrer">
+                {d.registration.label}<span class="vis-hidden"> (opens in a new tab)</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>
+              </a>
+            )}
+            <a class="btn btn-ghost" href={calendarUrl(entry)} target="_blank" rel="noopener noreferrer">
+              Add to calendar<span class="vis-hidden"> (opens Google Calendar in a new tab)</span>
+            </a>
+          </div>
+        )}
+      </div>
+      <div class="aside-card">
+        <h4>Share this event</h4>
+        <ShareLinks url={url} title={d.title} />
+      </div>
+    </aside>
+  </div></section>
+
+  {more.length > 0 && (
+    <section class="listing alt"><div class="wrap">
+      <div class="sec-head">
+        <div>
+          <span class="eyebrow" data-reveal>Also coming up</span>
+          <h2 data-reveal>More events.</h2>
+        </div>
+        <a class="arrow-link" href="/events" data-reveal>All events
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+      <div class="ev-list">{more.map((e) => <EventRow event={e} />)}</div>
+    </div></section>
+  )}
+
+  <section class="home-cta"><div class="wrap">
+    <h2 data-reveal>Questions about this event?</h2>
+    <p data-reveal>Get in touch and our team will come back to you with the details.</p>
+    <a href="/contact" class="btn btn-primary" data-reveal>Contact us
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+  </div></section>
+
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+</BaseLayout>
+
+<script>import "../../scripts/newsroom.ts";</script>
