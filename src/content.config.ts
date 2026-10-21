@@ -20,6 +20,9 @@ import { noEmDash } from "./lib/no-em-dash.mjs";
 // Free text shown on the site, with any em dash rewritten (see lib/no-em-dash.mjs).
 const copy = () => z.string().transform(noEmDash);
 
+// Editors never see build errors, so this schema must accept anything the CMS
+// form lets them save. A stricter rule here blocks every deploy until a
+// developer notices. Put new requirements in keystatic.config.ts instead.
 const news = defineCollection({
   loader: glob({ pattern: "**/*.md", base: "./src/content/news" }),
   schema: ({ image }) =>
@@ -52,10 +55,6 @@ const news = defineCollection({
           (v) => (v && typeof v === "object" && "href" in v ? v : undefined),
           z.object({ label: copy().default("Read more"), href: z.string().url() }).optional(),
         ),
-      })
-      .refine((d) => d.status !== "published" || !d.cover || d.coverAlt, {
-        message: "a published article with a cover image needs a cover image description",
-        path: ["coverAlt"],
       }),
 });
 

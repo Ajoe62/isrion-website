@@ -79,7 +79,7 @@ export default config({
         coverAlt: fields.text({
           label: "Cover image description",
           description:
-            "Describe what the image shows, for people using screen readers. Required when there is a cover image.",
+            "Describe what the image shows, for people using screen readers. Please fill this in whenever you add a cover image.",
           multiline: true,
         }),
         tags: fields.array(fields.text({ label: "Tag" }), {
