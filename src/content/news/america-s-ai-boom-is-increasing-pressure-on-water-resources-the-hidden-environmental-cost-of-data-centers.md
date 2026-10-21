@@ -2,7 +2,7 @@
 title: >-
   America’s AI Boom Is Increasing Pressure on Water Resources: The Hidden
   Environmental Cost of Data Centers
-status: review
+status: published
 date: 2026-10-21
 category: News
 summary: >-
