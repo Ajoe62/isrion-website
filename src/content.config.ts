@@ -6,39 +6,57 @@
 // "events" powers the events calendar: one Markdown file per event in
 //          src/content/events/, listed at /events and rendered at /events/<filename>/.
 //
-// To add an item: copy an existing file in the matching folder, rename it
-// (the filename becomes the URL) and edit the front matter below the `---`.
+// News is written in the Keystatic CMS at /keystatic (form defined in
+// keystatic.config.ts), which saves these same Markdown files. Events are
+// still edited by hand: copy an existing file in the folder, rename it (the
+// filename becomes the URL) and edit the front matter below the `---`.
 // A file that breaks the schema fails the build with the field name, so a
 // malformed item can never ship silently.
 // ---------------------------------------------------------------------------
 import { defineCollection, z } from "astro:content";
 import { glob } from "astro/loaders";
+import { noEmDash } from "./lib/no-em-dash.mjs";
+
+// Free text shown on the site, with any em dash rewritten (see lib/no-em-dash.mjs).
+const copy = () => z.string().transform(noEmDash);
 
 const news = defineCollection({
   loader: glob({ pattern: "**/*.md", base: "./src/content/news" }),
   schema: ({ image }) =>
-    z.object({
-      title: z.string(),
-      // Publication date. Drives the ordering of the listing page.
-      date: z.coerce.date(),
-      // Drives the filter chips on /news and the card colour.
-      category: z.enum(["News", "Research", "Insight", "Publication", "Announcement"]),
-      // One or two sentences: used on the card and as the page description.
-      summary: z.string(),
-      author: z.string().default("ISRION team"),
-      // Pins the article to the featured slot at the top of /news. Without it,
-      // the newest article is featured.
-      featured: z.boolean().default(false),
-      // Optional cover image. Reference it relative to this Markdown file,
-      // e.g. ../../assets/news/launch.jpg (or a plate in ../../assets/maps/).
-      cover: image().optional(),
-      coverAlt: z.string().optional(),
-      tags: z.array(z.string()).default([]),
-      // Optional outbound link, e.g. to a journal article or a dataset.
-      external: z.object({ label: z.string(), href: z.string().url() }).optional(),
-      // Drafts show in `npm run dev` and are dropped from production builds.
-      draft: z.boolean().default(false),
-    }),
+    z
+      .object({
+        title: copy(),
+        // The approval step. Writers save as "draft" or "review"; only
+        // "published" articles reach the production build. Everything shows in
+        // `npm run dev`.
+        status: z.enum(["draft", "review", "published"]).default("draft"),
+        // Publication date. Drives the ordering of the listing page.
+        date: z.coerce.date(),
+        // Drives the filter chips on /news and the card colour.
+        category: z.enum(["News", "Research", "Insight", "Publication", "Announcement"]),
+        // One or two sentences: used on the card and as the page description.
+        summary: copy(),
+        author: copy().default("ISRION team"),
+        // Pins the article to the featured slot at the top of /news. Without it,
+        // the newest article is featured.
+        featured: z.boolean().default(false),
+        // Optional cover image, relative to this Markdown file. The CMS saves
+        // uploads to ../../assets/news/<slug>/cover.<ext>.
+        cover: image().optional(),
+        coverAlt: copy().optional(),
+        tags: z.array(copy()).default([]),
+        // Optional outbound link, e.g. to a journal article or a dataset. The CMS
+        // writes an empty object when the link is left blank, so that counts as
+        // no link.
+        external: z.preprocess(
+          (v) => (v && typeof v === "object" && "href" in v ? v : undefined),
+          z.object({ label: copy().default("Read more"), href: z.string().url() }).optional(),
+        ),
+      })
+      .refine((d) => d.status !== "published" || !d.cover || d.coverAlt, {
+        message: "a published article with a cover image needs a cover image description",
+        path: ["coverAlt"],
+      }),
 });
 
 const events = defineCollection({

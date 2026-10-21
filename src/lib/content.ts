@@ -6,13 +6,15 @@ import { getCollection, type CollectionEntry } from "astro:content";
 export type Post = CollectionEntry<"news">;
 export type Event = CollectionEntry<"events">;
 
-// Drafts stay visible while you run `npm run dev` and are dropped from the
-// production build.
+// Unpublished items stay visible while you run `npm run dev` and are dropped
+// from the production build. Events use a `draft` flag; news uses the CMS
+// approval `status`.
 const published = (e: { data: { draft: boolean } }) => (import.meta.env.PROD ? !e.data.draft : true);
+const approved = (p: Post) => (import.meta.env.PROD ? p.data.status === "published" : true);
 
 /** All published articles, newest first. */
 export async function getPosts(): Promise<Post[]> {
-  return (await getCollection("news", published)).sort(
+  return (await getCollection("news", approved)).sort(
     (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
   );
 }

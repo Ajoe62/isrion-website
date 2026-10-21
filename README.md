@@ -1,6 +1,6 @@
 # ISRION International Ltd Website
 
-A fast, animated marketing site built with **Astro 6**, **Lenis** (smooth scroll) and **GSAP / ScrollTrigger** (scroll choreography). Static output, deployed on Vercel.
+A fast, animated marketing site built with **Astro 6**, **Lenis** (smooth scroll) and **GSAP / ScrollTrigger** (scroll choreography). Static output, deployed on Vercel, with a **Keystatic** CMS for news (see [Posting news](#posting-news-for-editors)).
 
 ---
 
@@ -62,7 +62,49 @@ Everything is in **`src/scripts/motion.ts`**: the hero load sequence, scroll rev
    ```
 3. Link to it with `<a href="/services">`. Because **View Transitions** is already wired up in `BaseLayout`, navigation between pages fades smoothly with no extra work.
 
-For a blog/insights section, use Astro **Content Collections** (Markdown/MDX); see https://docs.astro.build/en/guides/content-collections/.
+---
+
+## Posting news (for editors)
+
+News articles are written in the **ISRION Newsroom**, a web form at
+**https://www.isrioninternational.com/keystatic**. You don't need to touch any code.
+
+### Signing in
+You'll receive an email invitation from **Keystatic Cloud**. Accept it, then
+open the link above and sign in with the same email. No GitHub account needed.
+
+### Writing an article
+1. Click **News** in the sidebar, then **Add**.
+2. Fill in the form:
+   - **Title**: the web address is filled in from it automatically.
+   - **Status**: leave it on **Draft** while you work.
+   - **Publication date**, **Category**, **Summary** (one or two sentences for the card) and **Author**.
+   - **Cover image** (optional): drag a landscape JPG or PNG in, then describe what it shows under **Cover image description**.
+   - **Tags**, **Feature this article** and **External link** are optional.
+3. Write the article in the large editor. Use the toolbar for headings, bold, lists, links and images.
+4. Click **Save**. You can come back and continue at any time.
+
+### Approval
+- When the article is finished, the writer sets **Status** to **Ready for review** and saves.
+- The approver opens **News** (the list shows each article's status), reads the article, and sets **Status** to **Published**, then saves.
+- About a minute later it's live on **/news**. Draft and Ready for review articles never appear on the website.
+
+Only the approver sets **Published**. The CMS doesn't enforce this, so it's an agreement among the team.
+
+To take an article down, set it back to **Draft** and save. To delete it, use the
+**⋯** menu on the article.
+
+### House style
+The site never shows em dashes. Any that you type are changed to commas
+automatically when the site is published, so you don't have to worry about them.
+
+### For developers
+- The form is defined in `keystatic.config.ts`; the build rules in `src/content.config.ts`. Keep them in step.
+- Each save is a commit to `main` by the editor; Vercel redeploys. Pull before you work on the site.
+- Locally, `npm run dev` then open http://127.0.0.1:4321/keystatic (sign in through Keystatic Cloud). Saves still commit to GitHub.
+- Uploaded images land in `src/assets/news/<article>/`.
+- Editors are managed at https://keystatic.cloud (project `isrion-news/isrion-news`; the free plan allows 3 users).
+- Events are still edited by hand in `src/content/events/`.
 
 ---
 
@@ -79,9 +121,11 @@ For a blog/insights section, use Astro **Content Collections** (Markdown/MDX); s
 Live site: https://www.isrioninternational.com (the bare domain redirects to `www`).
 
 ### Deploy (Vercel)
-The repo is connected to Vercel, which reads `vercel.json` (build `npm run build`, output `dist`, security headers). Every `git push` to `main` redeploys automatically.
+The repo is connected to Vercel, which reads `vercel.json` (build `npm run build`, security headers). Every `git push` to `main`, including every CMS save, redeploys automatically.
 
-`netlify.toml` is kept only as a fallback config and is not in use.
+The `@astrojs/vercel` adapter writes the deployment to `.vercel/output`. Every page is still prerendered static HTML; only the CMS routes (`/keystatic`, `/api/keystatic`) run as a Vercel function. Keep the adapter on the major version that matches Astro (`@astrojs/vercel@10` for Astro 6).
+
+`netlify.toml` is kept only as a fallback config and is not in use. It would no longer work as is, because the build now targets Vercel.
 
 ### Domain & DNS (Truehost → Cloudflare → Vercel)
 1. **Cloudflare:** add `isrioninternational.com` on the Free plan and note the two nameservers it assigns.
