@@ -9,7 +9,7 @@ summary: >-
   As artificial intelligence infrastructure expands across the United States,
   new research reveals growing pressure on freshwater supplies, electricity
   infrastructure, and communities already facing water scarcity.
-author: Rabi Elabor Isrion International LTD Published October 20, 2026
+author: 'Rabi Elabor '
 cover: >-
   ../../assets/news/america-s-ai-boom-is-increasing-pressure-on-water-resources-the-hidden-environmental-cost-of-data-centers/cover.PNG
 tags: []
