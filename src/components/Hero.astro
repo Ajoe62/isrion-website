@@ -1,5 +1,5 @@
 ---
-import { company } from "../data/site";
+import { company, services } from "../data/site";
 // Background videos that cross-fade in sequence (see heroVideo() in motion.ts).
 // Add/remove files here; the rotation adapts to any count.
 const heroVideos = ["/hero.mp4", "/hero1.mp4", "/hero2.mp4", "/hero3.mp4", "/hero4.mp4", "/hero5.mp4"];
@@ -28,7 +28,7 @@ const heroVideos = ["/hero.mp4", "/hero1.mp4", "/hero2.mp4", "/hero3.mp4", "/her
       <a href="/contact" class="btn btn-ghost">Talk to our team</a>
     </div>
     <div class="hero-meta" data-reveal>
-      <div><span class="n" data-count="8">0</span><span class="l">Service domains</span></div>
+      <div><span class="n" data-count={services.length}>0</span><span class="l">Service domains</span></div>
       <div><span class="n" data-count="12">0</span><span class="l">Sectors served</span></div>
       <div><span class="n">{company.founded}</span><span class="l">Founded · FCT</span></div>
     </div>

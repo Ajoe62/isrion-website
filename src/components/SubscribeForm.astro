@@ -1,0 +1,90 @@
+---
+// Newsletter sign-up. Posts to /api/subscribe (src/pages/api/subscribe.ts),
+// which asks Brevo to send a double opt-in email; nobody joins the list until
+// they confirm. `_gotcha` is the spam honeypot, as on the contact form.
+---
+<section class="subscribe" id="subscribe" aria-labelledby="subscribe-title">
+  <div class="glow" aria-hidden="true"></div>
+  <div class="wrap subscribe-grid">
+    <div class="subscribe-copy">
+      <span class="eyebrow on-dark" data-reveal>Newsletter</span>
+      <h2 id="subscribe-title" data-reveal>Field notes in your inbox.</h2>
+      <p data-reveal>New research, maps and project updates from ISRION, sent when there is something worth reading. No spam; unsubscribe in one click.</p>
+    </div>
+
+    <form class="subscribe-form" action="/api/subscribe" method="POST" id="subscribeForm" novalidate data-reveal>
+      <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" style="display:none" aria-hidden="true" />
+      <label for="subscribe-email" class="vis-hidden">Email address</label>
+      <div class="subscribe-field">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+        <input
+          id="subscribe-email"
+          type="email"
+          name="email"
+          required
+          maxlength="254"
+          autocomplete="email"
+          placeholder="you@organisation.com"
+        />
+        <button type="submit" class="btn btn-primary">Subscribe
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+      </div>
+      <p class="subscribe-note">We'll email you a link to confirm. Your address is used only for ISRION updates.</p>
+      <p class="subscribe-status" role="status" aria-live="polite" hidden></p>
+    </form>
+  </div>
+</section>
+
+<script>
+  function wireSubscribe() {
+    const form = document.getElementById("subscribeForm") as HTMLFormElement | null;
+    if (!form || form.dataset.wired) return;
+    form.dataset.wired = "true";
+    const input = form.querySelector<HTMLInputElement>('input[name="email"]');
+    const status = form.querySelector<HTMLElement>(".subscribe-status");
+    const btn = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+    const show = (msg: string, ok: boolean) => {
+      if (!status) return;
+      status.hidden = false;
+      status.textContent = msg;
+      status.classList.toggle("ok", ok);
+      status.classList.toggle("err", !ok);
+    };
+
+    // Landing back here from the confirmation email (see BREVO_REDIRECT_URL).
+    if (new URLSearchParams(location.search).has("subscribed")) {
+      show("You're subscribed. Thanks for confirming your email.", true);
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (input && !input.checkValidity()) {
+        show("Please enter a valid email address.", false);
+        input.focus();
+        return;
+      }
+      const label = btn?.innerHTML ?? "";
+      if (btn) { btn.disabled = true; btn.textContent = "Subscribing…"; }
+      try {
+        const res = await fetch(form.action, {
+          method: "POST",
+          body: new FormData(form),
+          headers: { Accept: "application/json" },
+        });
+        const data = await res.json().catch(() => null);
+        if (res.ok && data?.ok) {
+          form.reset();
+          show(data.message, true);
+        } else {
+          show(data?.message || "Something went wrong. Please try again shortly.", false);
+        }
+      } catch {
+        show("Network error. Please check your connection and try again.", false);
+      } finally {
+        if (btn) { btn.disabled = false; btn.innerHTML = label; }
+      }
+    });
+  }
+  wireSubscribe();
+  document.addEventListener("astro:page-load", wireSubscribe);
+</script>

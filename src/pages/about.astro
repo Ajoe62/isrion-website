@@ -1,7 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import PageHero from "../components/PageHero.astro";
-import { company, values, objectives, leaders } from "../data/site";
+import { company, values, objectives, leaders, services } from "../data/site";
 const pad = (n: number) => String(n + 1).padStart(2, "0");
 ---
 <BaseLayout title={`About Us | ${company.name}`}>
@@ -36,7 +36,7 @@ const pad = (n: number) => String(n + 1).padStart(2, "0");
         <h3>Our mission</h3>
         <p>Deliver professional services that meet international standards and contribute to economic development, environmental protection and long-term sustainability.</p>
       </div>
-      <div class="bento-cell" data-reveal><span class="k" data-count="8">0</span><span class="kl">Service domains</span></div>
+      <div class="bento-cell" data-reveal><span class="k" data-count={services.length}>0</span><span class="kl">Service domains</span></div>
       <div class="bento-cell" data-reveal><span class="k" data-count="12">0</span><span class="kl">Sectors served</span></div>
       <div class="bento-cell bento-img bento-span2" data-reveal>
         <img src="/img/feature-office.jpg" alt="ISRION workspace" loading="lazy" />
@@ -82,14 +82,33 @@ const pad = (n: number) => String(n + 1).padStart(2, "0");
       <h2 data-reveal style="margin:1.2rem 0 2rem">The people behind the work.</h2>
       <div class="leaders cols">
         {leaders.map((l) => (
-          <div class="leader" data-reveal>
-            <div class="av">{l.initials}</div>
-            <div>
+          <a
+            class="leader is-link"
+            href={l.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`${l.name.replace(/^(Mr|Mrs|Ms|Dr)\.\s*/, "")} on ${l.linkLabel} (opens in a new tab)`}
+            data-reveal
+          >
+            <div class:list={["leader-photo", { "is-empty": !l.photo }]}>
+              {l.photo ? (
+                <img src={l.photo} alt={`Portrait of ${l.name}`} width="480" height="600" loading="lazy" />
+              ) : (
+                <>
+                  <svg class="leader-silhouette" viewBox="0 0 80 100" aria-hidden="true"><circle cx="40" cy="36" r="17"/><path d="M8 100c2-22 15-34 32-34s30 12 32 34z"/></svg>
+                  <span class="leader-initials" aria-hidden="true">{l.initials}</span>
+                </>
+              )}
+            </div>
+            <div class="leader-body">
               <h4>{l.name}</h4>
               <div class="role">{l.role}</div>
               <p>{l.bio}</p>
+              <span class="leader-link">{l.linkLabel}
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>
+              </span>
             </div>
-          </div>
+          </a>
         ))}
       </div>
     </div>

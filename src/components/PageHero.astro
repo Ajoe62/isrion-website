@@ -30,5 +30,6 @@ const { eyebrow, title, subtitle, current, parent, image } = Astro.props;
     <span class="eyebrow on-dark" data-reveal>{eyebrow}</span>
     <h1 data-reveal>{title}</h1>
     {subtitle && <p class="lead" data-reveal>{subtitle}</p>}
+    {Astro.slots.has("default") && <div class="page-hero-actions" data-reveal><slot /></div>}
   </div>
 </section>

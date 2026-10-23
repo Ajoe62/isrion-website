@@ -1,8 +1,16 @@
 ---
+// Our Works mirrors the Services page: hero, a numbered list, a secondary
+// section (the map gallery) and a CTA. The index bar under the hero is built
+// from the same data, so new projects and map series appear in it automatically.
 import BaseLayout from "../layouts/BaseLayout.astro";
 import PageHero from "../components/PageHero.astro";
 import MapGallery from "../components/MapGallery.astro";
 import { company, projects } from "../data/site";
+import { mapSeries } from "../data/maps";
+
+const pad = (n: number) => String(n + 1).padStart(2, "0");
+// "Flood hazard · Sentinel-1 SAR" reads as "Flood hazard" in the index bar.
+const shortLabel = (label: string) => label.split(" · ")[0];
 ---
 <BaseLayout title={`Our Works | ${company.name}`}>
   <PageHero
@@ -13,18 +21,45 @@ import { company, projects } from "../data/site";
     image="/img/projects-hero.jpg"
   />
 
-  <section class="projects-list"><div class="wrap">
-    <div class="proj-grid wide">
-      {projects.map((p) => (
-        <article class="proj-card" data-reveal>
-          <div class="thumb" data-sector={p.sector}>
-            {p.image && <img src={p.image} alt={p.title} loading="lazy" />}
-            <span class="chip">{p.sector}</span>
+  <!-- IN-PAGE INDEX -->
+  <nav class="page-index" aria-label="On this page">
+    <div class="wrap">
+      <a href="#projects"><span class="n">{projects.length}</span>Projects</a>
+      <span class="sep" aria-hidden="true"></span>
+      <span class="page-index-label">Cartography</span>
+      {mapSeries.map((s) => (
+        <a href={`#${s.id}`}><span class="n">{s.plates.length}</span>{shortLabel(s.label)}</a>
+      ))}
+    </div>
+  </nav>
+
+  <!-- PROJECT LIST -->
+  <section class="services-list works-list" id="projects"><div class="wrap">
+    <div class="sec-head">
+      <div>
+        <span class="eyebrow" data-reveal>Selected projects</span>
+        <h2 data-reveal>Engagements, start to finish.</h2>
+      </div>
+    </div>
+    <div class="svc-rows">
+      {projects.map((p, i) => (
+        <article class="svc-row work-row" data-reveal>
+          <div class="svc-row-idx">
+            <span class="idx">{pad(i)}</span>
+            <span class="cat">{p.sector}</span>
+            <dl class="work-meta">
+              <div><dt>Year</dt><dd>{p.year}</dd></div>
+              <div><dt>Location</dt><dd>{p.location}</dd></div>
+            </dl>
           </div>
-          <div class="meta"><span>{p.year}</span><span>{p.location}</span></div>
-          <h3>{p.title}</h3>
-          <p>{p.summary}</p>
-          <div class="tags">{p.tags.map((t) => <span>{t}</span>)}</div>
+          <div class="svc-row-body">
+            <h3>{p.title}</h3>
+            <p>{p.summary}</p>
+            <div class="tags">{p.tags.map((t) => <span>{t}</span>)}</div>
+          </div>
+          <div class="work-thumb" data-sector={p.sector}>
+            {p.image && <img src={p.image} alt="" loading="lazy" />}
+          </div>
         </article>
       ))}
     </div>

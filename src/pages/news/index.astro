@@ -5,6 +5,8 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import PageHero from "../../components/PageHero.astro";
 import NewsCard from "../../components/NewsCard.astro";
 import ResourceLinks from "../../components/ResourceLinks.astro";
+import SubscribeForm from "../../components/SubscribeForm.astro";
+import DomainGrid from "../../components/DomainGrid.astro";
 import { Image } from "astro:assets";
 import { company } from "../../data/site";
 import { fmtDate, getPosts, isoDay, readingTime } from "../../lib/content";
@@ -26,7 +28,10 @@ const count = (c: string) => rest.filter((p) => p.data.category === c).length;
     eyebrow="Newsroom"
     title="Evidence from the field, the lab and the map."
     subtitle="Announcements, research findings and published analysis from our environmental, geospatial, energy and sustainability work across Nigeria."
-  />
+  >
+    <a href="#subscribe" class="btn btn-ghost">Subscribe to updates
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg></a>
+  </PageHero>
 
   <section class="listing"><div class="wrap">
     {featured ? (
@@ -104,6 +109,10 @@ const count = (c: string) => rest.filter((p) => p.data.category === c).length;
       </div>
     )}
   </div></section>
+
+  <SubscribeForm />
+
+  <DomainGrid />
 
   <ResourceLinks />
 

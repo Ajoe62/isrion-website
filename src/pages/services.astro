@@ -7,7 +7,7 @@ import { company, services, steps } from "../data/site";
   <PageHero
     current="Services"
     eyebrow="What we do"
-    title="Eight domains. One coordinated team."
+    title="Services domains. One coordinated team."
     subtitle="From environmental assessment to geospatial intelligence and renewable energy: integrated services that turn complex challenges into buildable, compliant outcomes."
     image="/img/services-hero.jpg"
   />
@@ -16,7 +16,7 @@ import { company, services, steps } from "../data/site";
   <section class="services-list"><div class="wrap">
     <div class="svc-rows">
       {services.map((s) => (
-        <article class="svc-row" data-reveal>
+        <article class="svc-row" id={s.slug} data-reveal>
           <div class="svc-row-idx"><span class="idx">{s.idx}</span><span class="cat">{s.cat}</span></div>
           <div class="svc-row-body">
             <h3 set:html={s.title} />

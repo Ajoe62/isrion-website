@@ -70,6 +70,7 @@ export const values = [
 
 export type Service = {
   idx: string;
+  slug: string;          // anchor id on /services, e.g. /services#geospatial
   cat: string;
   title: string;
   desc: string;
@@ -78,44 +79,54 @@ export type Service = {
 
 export const services: Service[] = [
   {
-    idx: "01", cat: "Environmental", title: "Environmental Consulting",
+    idx: "01", slug: "environmental", cat: "Environmental", title: "Environmental Consulting",
     desc: "Impact assessment, audits, restoration and monitoring that keep projects compliant and ecosystems intact.",
     tags: ["EIA", "Compliance", "Remediation", "Climate strategy"],
   },
   {
-    idx: "02", cat: "Geospatial", title: "Geospatial Technology",
+    idx: "02", slug: "geospatial", cat: "Geospatial", title: "Geospatial Technology",
     desc: "GIS, remote sensing, drone mapping and GeoAI that turn terrain and imagery into decisions.",
     tags: ["GIS", "Remote sensing", "GeoAI", "Drone survey"],
   },
   {
-    idx: "03", cat: "Engineering", title: "Engineering & Technical Consultancy",
+    idx: "03", slug: "engineering", cat: "Engineering", title: "Engineering & Technical Consultancy",
     desc: "Civil and environmental engineering support, feasibility studies, due diligence and project oversight.",
     tags: ["Feasibility", "Design review", "Due diligence"],
   },
   {
-    idx: "04", cat: "Energy", title: "Renewable Energy Solutions",
+    idx: "04", slug: "renewable-energy", cat: "Energy", title: "Renewable Energy Solutions",
     desc: "Feasibility, solar integration, efficiency and transition planning toward clean, resilient power.",
     tags: ["Solar", "Efficiency", "Carbon", "Transition"],
   },
   {
-    idx: "05", cat: "ESG", title: "ESG Advisory",
+    idx: "05", slug: "esg", cat: "ESG", title: "ESG Advisory",
     desc: "Strategy, reporting, risk assessment and stakeholder engagement for credible sustainability programs.",
     tags: ["Strategy", "Reporting", "Risk"],
   },
   {
-    idx: "06", cat: "Research", title: "Research & Development",
+    idx: "06", slug: "research", cat: "Research", title: "Research & Development",
     desc: "Multidisciplinary research across climate, public health, agriculture and resource management.",
     tags: ["Climate", "Public health", "Resources"],
   },
   {
-    idx: "07", cat: "Procurement", title: "Strategic Sourcing",
+    idx: "07", slug: "procurement", cat: "Procurement", title: "Strategic Sourcing",
     desc: "Procurement planning, vendor evaluation and sourcing of analytical and scientific equipment.",
     tags: ["Sourcing", "Supply chain", "Equipment"],
   },
   {
-    idx: "08", cat: "Agri-Tech", title: "Agriculture & Agri-Tech",
+    idx: "08", slug: "agri-tech", cat: "Agri-Tech", title: "Agriculture & Agri-Tech",
     desc: "Precision agriculture, resource mapping and soil & water assessment for productive, sustainable farming.",
     tags: ["Precision ag", "Soil & water", "Mapping"],
+  },
+  {
+    idx: "09", slug: "ai-big-data", cat: "AI & Data", title: "AI & Big Data",
+    desc: "Machine learning, predictive analytics and large-scale data engineering that turn environmental, spatial and operational data into forecasts and decisions.",
+    tags: ["Machine learning", "Predictive analytics", "Data engineering", "Dashboards"],
+  },
+  {
+    idx: "10", slug: "drone-technology", cat: "Drones", title: "Drone Technology",
+    desc: "UAV survey, photogrammetry, LiDAR and multispectral imaging for mapping, inspection, agriculture and disaster response.",
+    tags: ["UAV survey", "Photogrammetry", "LiDAR", "Multispectral"],
   },
 ];
 
@@ -139,13 +150,24 @@ export const objectives = [
   "Research, innovation and training in sustainable development.",
 ];
 
-export const leaders = [
+// Headshots: drop a portrait (4:5 is ideal, at least 600px wide) into
+// public/img/team/ and set `photo`, e.g. "/img/team/isa-elabor.jpg".
+// Without one the card shows an initials placeholder in the same 4:5 frame;
+// other shapes are cropped to it, centred on the face.
+export const leaders: {
+  initials: string; name: string; role: string;
+  href: string; linkLabel: string; bio: string; photo?: string;
+}[] = [
   {
-    initials: "IE", name: "Mr. Isa Elabor", role: "Director",
+    initials: "IE", name: "Mr. Isa Elabor", role: "Co-founder & CEO",
+    href: "https://www.linkedin.com/in/isa-elabor", linkLabel: "LinkedIn",
+    photo: "/img/team/isa-elabor.jpg",
     bio: "Strategic leadership and corporate oversight, with experience across business administration, project management and environmental consulting.",
   },
   {
-    initials: "RE", name: "Mrs. Rabi Elabor", role: "Director",
+    initials: "RE", name: "Ms. Rabi Elabor", role: "Co-founder & Managing Director",
+    href: "https://rabielabor.vercel.app", linkLabel: "Website",
+    photo: "/img/team/rabi-elabor.jpg",
     bio: "Strategic planning, stakeholder engagement and operational management, supporting the company's commitment to sustainable growth.",
   },
 ];

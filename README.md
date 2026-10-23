@@ -117,13 +117,14 @@ automatically when the site is published, so you don't have to worry about them.
 | DNS | **Cloudflare** (Truehost nameservers point to Cloudflare) |
 | Email | **Cloudflare Email Routing** (forwards to Gmail) |
 | Contact form | **Formspree** |
+| Newsletter | **Brevo** (double opt-in list) |
 
 Live site: https://www.isrioninternational.com (the bare domain redirects to `www`).
 
 ### Deploy (Vercel)
 The repo is connected to Vercel, which reads `vercel.json` (build `npm run build`, security headers). Every `git push` to `main`, including every CMS save, redeploys automatically.
 
-The `@astrojs/vercel` adapter writes the deployment to `.vercel/output`. Every page is still prerendered static HTML; only the CMS routes (`/keystatic`, `/api/keystatic`) run as a Vercel function. Keep the adapter on the major version that matches Astro (`@astrojs/vercel@10` for Astro 6).
+The `@astrojs/vercel` adapter writes the deployment to `.vercel/output`. Every page is still prerendered static HTML; only the CMS routes (`/keystatic`, `/api/keystatic`) and the newsletter endpoint (`/api/subscribe`) run as Vercel functions. Keep the adapter on the major version that matches Astro (`@astrojs/vercel@10` for Astro 6).
 
 `netlify.toml` is kept only as a fallback config and is not in use. It would no longer work as is, because the build now targets Vercel.
 
@@ -143,13 +144,41 @@ The `@astrojs/vercel` adapter writes the deployment to `.vercel/output`. Every p
 If the domain ever changes, update all three of: `site` in `astro.config.mjs`, `company.url` in `src/data/site.ts` and the `Sitemap:` line in `public/robots.txt`.
 
 ### Email (Cloudflare Email Routing)
-Free, receive-only forwarding: mail to addresses like `info@isrioninternational.com` is forwarded to `isrioninternational@gmail.com`. Cloudflare does not store mail or send it.
+Free, receive-only forwarding: mail sent to a custom address on the domain is forwarded to a Gmail inbox. Cloudflare does not store or send mail.
 
-1. Cloudflare: **Email → Email Routing → Get started**.
-2. Add the Gmail address as a destination and confirm the verification email.
-3. Create the custom addresses (e.g. `info@`) and let Cloudflare add its MX and SPF records automatically.
+Planned addresses:
 
-To *send* as `info@isrioninternational.com` from Gmail, add an SMTP relay (e.g. Brevo's free tier) under Gmail **Settings → Accounts → Send mail as**.
+| Address | Forwards to |
+|---|---|
+| `founder@isrioninternational.com` | Isa Elabor's Gmail |
+| `rabi@isrioninternational.com` | Rabi Elabor's Gmail |
+| `support@isrioninternational.com` | `isrioninternational@gmail.com` |
+| `news@isrioninternational.com` | `isrioninternational@gmail.com` (newsletter sender and replies) |
+
+1. Cloudflare: **Email → Email Routing → Get started**, and let Cloudflare add its MX and SPF records.
+2. **Destination addresses:** add each Gmail inbox and click the verification link Cloudflare emails to it.
+3. **Routing rules → Custom addresses:** create each address above and pick its destination. Optionally turn on **Catch-all** to route any other `@isrioninternational.com` address to the main inbox.
+4. **Sending as these addresses:** Cloudflare only receives. In Brevo, open **SMTP & API → SMTP** for the relay login. Then in each Gmail account go to **Settings → Accounts → Send mail as → Add another email address**, using `smtp-relay.brevo.com`, port `587`, TLS.
+5. **Authentication (DNS, in Cloudflare):** a domain may have only **one** SPF record, so merge Cloudflare's and Brevo's into one: `v=spf1 include:_spf.mx.cloudflare.net include:spf.brevo.com ~all`. Add the DKIM and verification records Brevo shows under **Senders, Domains & Dedicated IPs → Domains → Authenticate**. Add a DMARC record: TXT `_dmarc` = `v=DMARC1; p=none; rua=mailto:support@isrioninternational.com`, and tighten it to `p=quarantine` once reports look clean.
+6. Once mail to `support@` arrives, switch `company.email` in `src/data/site.ts` to it.
+
+### Newsletter (Brevo)
+The **Subscribe** band on `/news` (`src/components/SubscribeForm.astro`) posts to `/api/subscribe` (`src/pages/api/subscribe.ts`). That endpoint runs as a Vercel function and asks Brevo to send a **double opt-in** email; a person joins the list only after clicking the confirmation link. Brevo handles unsubscribes.
+
+One-time setup in Brevo:
+1. **Contacts → Lists:** create a list (e.g. "ISRION newsletter") and note its ID.
+2. **Templates:** create a template tagged as a double opt-in confirmation (it must contain the `{{ doubleoptin }}` link) and note its ID. Use `news@isrioninternational.com` as the sender after the domain is authenticated (step 5 above).
+3. **SMTP & API → API keys:** create a key.
+4. **Vercel → Settings → Environment Variables** (Production and Preview), then redeploy:
+
+   | Variable | Example |
+   |---|---|
+   | `BREVO_API_KEY` | `xkeysib-...` |
+   | `BREVO_LIST_ID` | `3` |
+   | `BREVO_DOI_TEMPLATE_ID` | `7` |
+   | `BREVO_REDIRECT_URL` | `https://www.isrioninternational.com/news?subscribed=1#subscribe` |
+
+For local testing, put the same four values in a `.env` file at the project root (it is git-ignored; see `.env.example`). Newsletters are written and sent from Brevo's **Campaigns** screen.
 
 ### Contact form
 `ContactForm.astro` posts to **Formspree** (no backend, works on any host). The form ID lives in `company.formspreeId` in `src/data/site.ts`; submissions arrive by email and in the Formspree dashboard.
@@ -163,5 +192,6 @@ To *send* as `info@isrioninternational.com` from Gmail, add an SMTP relay (e.g. 
 - [x] Register the domain (`isrioninternational.com`).
 - [x] Update `site` in `astro.config.mjs` to the real domain.
 - [ ] Point DNS through Cloudflare to Vercel and confirm HTTPS on both `www` and the bare domain.
-- [ ] Set up Cloudflare Email Routing, then switch `company.email` in `src/data/site.ts` to `info@isrioninternational.com`.
+- [ ] Set up Cloudflare Email Routing (founder@, rabi@, support@, news@), then switch `company.email` in `src/data/site.ts` to `support@isrioninternational.com`.
+- [ ] Create the Brevo list, double opt-in template and API key, and add the four `BREVO_*` variables in Vercel.
 ```

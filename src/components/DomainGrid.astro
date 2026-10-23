@@ -1,0 +1,42 @@
+---
+// Compact index of every service domain, used where the domains are context
+// rather than the subject (e.g. the newsroom). Each tile deep-links to its full
+// row on /services. Entries come from `services` in src/data/site.ts.
+import { services } from "../data/site";
+
+interface Props {
+  eyebrow?: string;
+  title?: string;
+  intro?: string;
+}
+const {
+  eyebrow = "What we cover",
+  title = "Our services domains.",
+  intro = "The stories here come out of these areas of work. Select one to see what it involves.",
+} = Astro.props;
+---
+
+<section class="domain-section" aria-labelledby="domain-title">
+  <div class="wrap">
+    <div class="domain-head">
+      <div>
+        <span class="eyebrow" data-reveal>{eyebrow}</span>
+        <h2 id="domain-title" data-reveal>{title}</h2>
+      </div>
+      <p data-reveal>{intro}</p>
+    </div>
+
+    <ul class="domain-grid" role="list">
+      {services.map((s) => (
+        <li data-reveal>
+          <a class="domain-tile" href={`/services#${s.slug}`}>
+            <span class="domain-idx">{s.idx}</span>
+            <span class="domain-cat">{s.cat}</span>
+            <span class="domain-title" set:html={s.title} />
+            <svg class="domain-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
