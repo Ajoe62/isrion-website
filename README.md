@@ -115,8 +115,10 @@ automatically when the site is published, so you don't have to worry about them.
 | Site hosting | **Vercel** (deploys from GitHub) |
 | Domain registrar | **Truehost** (`isrioninternational.com`) |
 | DNS | **Cloudflare** (Truehost nameservers point to Cloudflare) |
-| Email | **Cloudflare Email Routing** (forwards to Gmail) |
-| Contact form | **Formspree** |
+| Email (receiving) | **Cloudflare Email Routing** (forwards to Gmail) |
+| Email (sending as @isrioninternational.com) | **Gmail "Send mail as"** through **Brevo SMTP** |
+| support@ auto-reply | **Cloudflare Email Worker** (`workers/support-autoreply`) |
+| Contact form | `/api/contact` → **Brevo** transactional email, **Cloudflare Turnstile** anti-spam |
 | Newsletter | **Brevo** (double opt-in list) |
 
 Live site: https://www.isrioninternational.com (the bare domain redirects to `www`).
@@ -124,7 +126,7 @@ Live site: https://www.isrioninternational.com (the bare domain redirects to `ww
 ### Deploy (Vercel)
 The repo is connected to Vercel, which reads `vercel.json` (build `npm run build`, security headers). Every `git push` to `main`, including every CMS save, redeploys automatically.
 
-The `@astrojs/vercel` adapter writes the deployment to `.vercel/output`. Every page is still prerendered static HTML; only the CMS routes (`/keystatic`, `/api/keystatic`) and the newsletter endpoint (`/api/subscribe`) run as Vercel functions. Keep the adapter on the major version that matches Astro (`@astrojs/vercel@10` for Astro 6).
+The `@astrojs/vercel` adapter writes the deployment to `.vercel/output`. Every page is still prerendered static HTML; only the CMS routes (`/keystatic`, `/api/keystatic`), the newsletter endpoint (`/api/subscribe`) and the contact endpoint (`/api/contact`) run as Vercel functions. Keep the adapter on the major version that matches Astro (`@astrojs/vercel@10` for Astro 6).
 
 `netlify.toml` is kept only as a fallback config and is not in use. It would no longer work as is, because the build now targets Vercel.
 
@@ -143,24 +145,50 @@ The `@astrojs/vercel` adapter writes the deployment to `.vercel/output`. Every p
 
 If the domain ever changes, update all three of: `site` in `astro.config.mjs`, `company.url` in `src/data/site.ts` and the `Sitemap:` line in `public/robots.txt`.
 
-### Email (Cloudflare Email Routing)
-Free, receive-only forwarding: mail sent to a custom address on the domain is forwarded to a Gmail inbox. Cloudflare does not store or send mail.
+### Email (Cloudflare Email Routing + Brevo SMTP)
+Free setup. Cloudflare receives mail for the domain and forwards it to Gmail; it does not store or send mail. Sending as a domain address goes from Gmail through Brevo's SMTP relay.
 
-Planned addresses:
-
-| Address | Forwards to |
+| Address | Route |
 |---|---|
 | `founder@isrioninternational.com` | Isa Elabor's Gmail |
 | `rabi@isrioninternational.com` | Rabi Elabor's Gmail |
-| `support@isrioninternational.com` | `isrioninternational@gmail.com` |
+| `support@isrioninternational.com` | **Send to a Worker:** `isrion-support-autoreply` (forwards to `isrioninternational@gmail.com` and auto-replies) |
 | `news@isrioninternational.com` | `isrioninternational@gmail.com` (newsletter sender and replies) |
+| Catch-all (any other address) | `isrioninternational@gmail.com` |
 
+**Receiving**
 1. Cloudflare: **Email → Email Routing → Get started**, and let Cloudflare add its MX and SPF records.
 2. **Destination addresses:** add each Gmail inbox and click the verification link Cloudflare emails to it.
-3. **Routing rules → Custom addresses:** create each address above and pick its destination. Optionally turn on **Catch-all** to route any other `@isrioninternational.com` address to the main inbox.
-4. **Sending as these addresses:** Cloudflare only receives. In Brevo, open **SMTP & API → SMTP** for the relay login. Then in each Gmail account go to **Settings → Accounts → Send mail as → Add another email address**, using `smtp-relay.brevo.com`, port `587`, TLS.
-5. **Authentication (DNS, in Cloudflare):** a domain may have only **one** SPF record, so merge Cloudflare's and Brevo's into one: `v=spf1 include:_spf.mx.cloudflare.net include:spf.brevo.com ~all`. Add the DKIM and verification records Brevo shows under **Senders, Domains & Dedicated IPs → Domains → Authenticate**. Add a DMARC record: TXT `_dmarc` = `v=DMARC1; p=none; rua=mailto:support@isrioninternational.com`, and tighten it to `p=quarantine` once reports look clean.
-6. Once mail to `support@` arrives, switch `company.email` in `src/data/site.ts` to it.
+3. **Routing rules → Custom addresses:** create each address above. Route `support@` to the main Gmail for now, and switch it to the Worker once that is deployed (see "Support auto-reply" below). Turn on **Catch-all** for the main inbox.
+
+**Authentication (DNS, in Cloudflare)**
+
+4. A domain may have only **one** SPF record, so merge Cloudflare's and Brevo's into one: `v=spf1 include:_spf.mx.cloudflare.net include:spf.brevo.com ~all`.
+5. In Brevo, **Senders, Domains & Dedicated IPs → Domains → Add a domain → Authenticate**, and add the DKIM and verification records it shows (DNS only). Wait until Brevo shows the domain as authenticated.
+6. Add a DMARC record: TXT `_dmarc` = `v=DMARC1; p=none; rua=mailto:support@isrioninternational.com`, and tighten it to `p=quarantine` after two weeks of clean reports.
+
+**Sending as these addresses**
+
+7. In Brevo, **SMTP & API → SMTP** shows the SMTP login (it looks like `xxxx@smtp-brevo.com`). Generate an **SMTP key** there; it is not the same as the API key.
+8. In each Gmail account, **Settings → See all settings → Accounts → Send mail as → Add another email address**. Enter the name and address (e.g. `founder@isrioninternational.com`), leave **Treat as an alias** ticked, then use server `smtp-relay.brevo.com`, port `587`, TLS, with the SMTP login and key from step 7. Gmail emails a code to the address; it arrives in the same inbox through Cloudflare.
+9. In the same screen choose **Reply from the same address the message was sent to**.
+10. Test: send to each address from an outside account, reply, and check the score at [mail-tester.com](https://www.mail-tester.com) (aim for 9/10 or better).
+
+Brevo's free plan sends **300 emails a day**, shared by Gmail sending, newsletter confirmations, welcome emails and contact form emails. If that becomes tight, Brevo's Starter plan removes the daily cap with no other changes.
+
+### Support auto-reply (Cloudflare Email Worker)
+`workers/support-autoreply` is a small Cloudflare Worker that receives every message sent to `support@`. It always forwards the message to `FORWARD_TO` (set in its `wrangler.toml`), then sends the sender one "we've received your email" reply, threaded to their message.
+
+It does not reply to bounces, mailing lists, newsletters, other auto-replies, no-reply senders, or mail from our own domain (such as contact form notifications), so it cannot loop. Cloudflare only lets it reply to mail that passes DMARC, so spoofed senders get nothing. It runs on Cloudflare's free plan and does not use the Brevo quota.
+
+Deploy (once, and again after any change):
+1. `cd workers/support-autoreply && npm install`
+2. `npx wrangler login` (opens the browser; sign in to the Cloudflare account that holds the domain)
+3. `npm run deploy`
+4. Cloudflare: **Email → Email Routing → Routing rules**, edit `support@`, set the action to **Send to a Worker** and pick `isrion-support-autoreply`.
+5. Email `support@` from an outside account: the message should land in the support Gmail and the sender should receive the auto-reply. `npm run tail` shows live logs.
+
+Optional: to send at most one auto-reply per sender per day, create a KV namespace (`npx wrangler kv namespace create REPLIED`), uncomment the `kv_namespaces` block in `wrangler.toml` with its id, and redeploy. The reply text lives in `buildReply` in `src/index.ts`.
 
 ### Newsletter (Brevo)
 The **Subscribe** band on `/news` (`src/components/SubscribeForm.astro`) posts to `/api/subscribe` (`src/pages/api/subscribe.ts`). That endpoint runs as a Vercel function and asks Brevo to send a **double opt-in** email; a person joins the list only after clicking the confirmation link. Brevo handles unsubscribes.
@@ -178,10 +206,33 @@ One-time setup in Brevo:
    | `BREVO_DOI_TEMPLATE_ID` | `7` |
    | `BREVO_REDIRECT_URL` | `https://www.isrioninternational.com/news?subscribed=1#subscribe` |
 
+5. **Welcome email:** **Automations → Create an automation → Welcome message**, triggered when a contact is added to the newsletter list, sending a short welcome email from `news@`. Optionally add a second step that emails `support@` about each new subscriber.
+
 For local testing, put the same four values in a `.env` file at the project root (it is git-ignored; see `.env.example`). Newsletters are written and sent from Brevo's **Campaigns** screen.
 
+What a subscriber sees: a "check your inbox" message under the form, the confirmation email, a "You're subscribed" message when the confirm link brings them back to `/news`, then the welcome email.
+
 ### Contact form
-`ContactForm.astro` posts to **Formspree** (no backend, works on any host). The form ID lives in `company.formspreeId` in `src/data/site.ts`; submissions arrive by email and in the Formspree dashboard.
+`ContactForm.astro` posts to `/api/contact` (`src/pages/api/contact.ts`), a Vercel function. It checks the Cloudflare Turnstile token, then sends two emails through Brevo's transactional API:
+
+1. a notification to `CONTACT_TO`, with **Reply-To** set to the visitor, so pressing Reply in Gmail answers them directly;
+2. an acknowledgement to the visitor from `CONTACT_FROM`. It is deliberately generic and never repeats the visitor's name or message, so the form cannot be used to send spam to someone else.
+
+The visitor also sees a success or error message under the form. If the notification cannot be sent, they are asked to email `company.email` instead.
+
+One-time setup:
+1. Cloudflare: **Turnstile → Add widget**, name it "ISRION contact form", add the hostnames `isrioninternational.com` and `www.isrioninternational.com`, mode **Managed**. Note the site key and secret key.
+2. The sender address (`CONTACT_FROM`) must be on the domain authenticated in Brevo (step 5 under Email).
+3. **Vercel → Settings → Environment Variables** (Production and Preview), then redeploy:
+
+   | Variable | Example |
+   |---|---|
+   | `CONTACT_TO` | `support@isrioninternational.com` |
+   | `CONTACT_FROM` | `support@isrioninternational.com` |
+   | `PUBLIC_TURNSTILE_SITE_KEY` | `0x4AAAA...` (public; baked into the page at build time) |
+   | `TURNSTILE_SECRET_KEY` | `0x4AAAA...` |
+
+   `BREVO_API_KEY` is shared with the newsletter. For local development, `.env.example` contains Cloudflare's test Turnstile keys, which always pass.
 
 ---
 
@@ -192,6 +243,9 @@ For local testing, put the same four values in a `.env` file at the project root
 - [x] Register the domain (`isrioninternational.com`).
 - [x] Update `site` in `astro.config.mjs` to the real domain.
 - [ ] Point DNS through Cloudflare to Vercel and confirm HTTPS on both `www` and the bare domain.
-- [ ] Set up Cloudflare Email Routing (founder@, rabi@, support@, news@), then switch `company.email` in `src/data/site.ts` to `support@isrioninternational.com`.
-- [ ] Create the Brevo list, double opt-in template and API key, and add the four `BREVO_*` variables in Vercel.
+- [ ] Set up Cloudflare Email Routing (founder@, rabi@, support@, news@). `company.email` in `src/data/site.ts` already shows `support@isrioninternational.com`, so do this before deploying.
+- [ ] Authenticate the domain in Brevo, merge SPF, add DMARC, and set up Gmail "Send mail as" for each address.
+- [ ] Deploy `workers/support-autoreply` and route `support@` to it.
+- [ ] Create the Brevo list, double opt-in template, welcome automation and API key, and add the four `BREVO_*` variables in Vercel.
+- [ ] Create the Turnstile widget and add `CONTACT_TO`, `CONTACT_FROM`, `PUBLIC_TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY` in Vercel.
 ```

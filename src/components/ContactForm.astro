@@ -1,39 +1,56 @@
 ---
-import { company } from "../data/site";
+// Contact form. Posts to /api/contact (src/pages/api/contact.ts), which emails
+// the enquiry to the team through Brevo and sends the visitor an
+// acknowledgement. Cloudflare Turnstile blocks bots; `_gotcha` is a honeypot.
+// The Turnstile site key is public and baked in at build time.
+const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY ?? "";
 ---
-<!--
-  Formspree: host-agnostic (works on Vercel, Cloudflare Pages, etc.); no backend.
-  Submits via fetch() so the visitor stays on the page; `_gotcha` is the spam honeypot.
-  Set the form ID in src/data/site.ts (company.formspreeId).
--->
-<form
-  method="POST"
-  action={`https://formspree.io/f/${company.formspreeId}`}
-  class="contact-form"
-  data-reveal
-  id="contactForm"
->
-  <input type="hidden" name="_subject" value="New enquiry: ISRION website" />
+<form method="POST" action="/api/contact" class="contact-form" data-reveal id="contactForm" novalidate>
   <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" style="display:none" aria-hidden="true" />
 
   <div class="row2">
-    <label>Name<input type="text" name="name" required autocomplete="name" /></label>
-    <label>Email<input type="email" name="email" required autocomplete="email" /></label>
+    <label>Name<input type="text" name="name" required maxlength="100" autocomplete="name" /></label>
+    <label>Email<input type="email" name="email" required maxlength="254" autocomplete="email" /></label>
   </div>
-  <label>Organisation<input type="text" name="organisation" autocomplete="organization" /></label>
-  <label>How can we help?<textarea name="message" rows="5" required></textarea></label>
+  <label>Organisation<input type="text" name="organisation" maxlength="150" autocomplete="organization" /></label>
+  <label>How can we help?<textarea name="message" rows="5" required maxlength="5000"></textarea></label>
+  {siteKey && <div class="turnstile" data-sitekey={siteKey}></div>}
   <button type="submit" class="btn btn-primary">Send message
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
   <p class="form-status" role="status" aria-live="polite" hidden></p>
 </form>
 
 <script>
+  type Turnstile = {
+    render: (el: HTMLElement, opts: Record<string, unknown>) => string;
+    reset: (id: string) => void;
+    getResponse: (id: string) => string | undefined;
+  };
+  const w = window as unknown as { turnstile?: Turnstile };
+
+  // Load Turnstile once per visit, in explicit mode, so the widget can be
+  // rendered again after each ClientRouter navigation.
+  let turnstileReady: Promise<Turnstile> | null = null;
+  function loadTurnstile(): Promise<Turnstile> {
+    if (w.turnstile) return Promise.resolve(w.turnstile);
+    turnstileReady ??= new Promise((resolve, reject) => {
+      const s = document.createElement("script");
+      s.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+      s.async = true;
+      s.onload = () => (w.turnstile ? resolve(w.turnstile) : reject(new Error("Turnstile missing")));
+      s.onerror = () => { turnstileReady = null; reject(new Error("Turnstile failed to load")); };
+      document.head.appendChild(s);
+    });
+    return turnstileReady;
+  }
+
   function wireContactForm() {
     const form = document.getElementById("contactForm") as HTMLFormElement | null;
     if (!form || form.dataset.wired) return;
     form.dataset.wired = "true";
     const status = form.querySelector<HTMLElement>(".form-status");
     const btn = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+    const box = form.querySelector<HTMLElement>(".turnstile");
     const show = (msg: string, ok: boolean) => {
       if (!status) return;
       status.hidden = false;
@@ -42,27 +59,50 @@ import { company } from "../data/site";
       status.classList.toggle("err", !ok);
     };
 
+    let ts: Turnstile | null = null;
+    let widgetId: string | null = null;
+    if (box) {
+      loadTurnstile()
+        .then((t) => {
+          ts = t;
+          widgetId = t.render(box, { sitekey: box.dataset.sitekey, theme: "dark" });
+        })
+        .catch(() => show("The spam check couldn't load. Please refresh the page, or email us directly.", false));
+    }
+
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
-      if (btn) { btn.disabled = true; btn.dataset.label = btn.textContent || ""; btn.textContent = "Sending…"; }
+      const invalid = [...form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>("input[required], textarea[required]")]
+        .find((el) => !el.checkValidity());
+      if (invalid) {
+        show(invalid.type === "email" ? "Please enter a valid email address." : "Please fill in the required fields.", false);
+        invalid.focus();
+        return;
+      }
+      if (box && !(ts && widgetId && ts.getResponse(widgetId))) {
+        show("Please complete the verification check above the button.", false);
+        return;
+      }
+      if (btn) { btn.disabled = true; btn.dataset.label = btn.innerHTML; btn.textContent = "Sending…"; }
       try {
         const res = await fetch(form.action, {
           method: "POST",
           body: new FormData(form),
           headers: { Accept: "application/json" },
         });
-        if (res.ok) {
+        const data = await res.json().catch(() => null);
+        if (res.ok && data?.ok) {
           form.reset();
-          show("Thanks, your message has been sent. We'll be in touch shortly.", true);
+          show(data.message, true);
         } else {
-          const data = await res.json().catch(() => null);
-          const msg = data?.errors?.map((x: { message: string }) => x.message).join(", ");
-          show(msg || "Something went wrong. Please email us directly.", false);
+          show(data?.message || "Something went wrong. Please email us directly.", false);
         }
       } catch {
         show("Network error. Please email us directly.", false);
       } finally {
-        if (btn) { btn.disabled = false; btn.textContent = btn.dataset.label || "Send message"; }
+        // Turnstile tokens are single use; get a fresh one for any retry.
+        if (ts && widgetId) ts.reset(widgetId);
+        if (btn) { btn.disabled = false; btn.innerHTML = btn.dataset.label || "Send message"; }
       }
     });
   }
@@ -81,6 +121,7 @@ import { company } from "../data/site";
   .contact-form input:focus,.contact-form textarea:focus{outline:none;border-color:#fff;background:rgba(255,255,255,.14)}
   .contact-form textarea{resize:vertical;min-height:120px}
   .contact-form button{justify-self:start;margin-top:.4rem}
+  .turnstile{min-height:65px}
   .contact-form button:disabled{opacity:.65;cursor:default}
   .form-status{font-family:"Manrope";font-size:.92rem;letter-spacing:0;text-transform:none;margin-top:.2rem}
   .form-status.ok{color:#bff3d4}
