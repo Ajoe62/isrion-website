@@ -7,7 +7,7 @@ export const company = {
   name: "ISRION International Ltd",
   short: "ISRION",
   rc: "RC 9120351",
-  email: "isrioninternational@gmail.com",
+  email: "support@isrioninternational.com",
   location: "Kubwa · FCT · Nigeria",
   address: "Flat 2, Block 59 Kubwa II, Kubwa, FCT, Nigeria",
   founded: "2025",
@@ -15,10 +15,6 @@ export const company = {
   // Used for SEO + sitemap. Keep in sync with `site` in astro.config.mjs.
   url: "https://www.isrioninternational.com",
   coords: "09.04°N · 07.36°E · Abuja, Nigeria",
-  // Formspree form ID; powers the contact form on any static host (Vercel etc).
-  // Create a free form at https://formspree.io and paste the ID from the
-  // endpoint it gives you (https://formspree.io/f/XXXXXXXX → use "XXXXXXXX").
-  formspreeId: "xojzgypn",
 };
 
 // Primary navigation: individual pages (multi-page site).

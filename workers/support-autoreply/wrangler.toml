@@ -1,0 +1,20 @@
+# Cloudflare Email Worker for support@isrioninternational.com.
+# Deploy with `npm run deploy` from this folder, then in Cloudflare open
+# Email > Email Routing > Routing rules and set support@ to "Send to a Worker"
+# with this Worker. See "Support auto-reply" in the project README.
+name = "isrion-support-autoreply"
+main = "src/index.ts"
+compatibility_date = "2025-09-01"
+
+[vars]
+# Where support mail lands. Must be a verified destination address in
+# Email Routing (Email > Email Routing > Destination addresses).
+FORWARD_TO = "isrioninternational@gmail.com"
+REPLY_NAME = "ISRION International Ltd"
+SITE_URL = "https://www.isrioninternational.com"
+
+# Optional: limit auto-replies to one per sender per day. Create a KV namespace
+# (`npx wrangler kv namespace create REPLIED`) and uncomment with its id.
+# [[kv_namespaces]]
+# binding = "REPLIED"
+# id = "<namespace id>"
