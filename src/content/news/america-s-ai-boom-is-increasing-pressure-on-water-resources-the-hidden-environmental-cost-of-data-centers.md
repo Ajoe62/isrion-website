@@ -98,6 +98,6 @@ As the United States continues expanding its data center infrastructure, transpa
 
 ---
 
-**ISRION INTERNATIONAL LTD** *— The Catalyst for Sustainable Change.*
+**ISRION INTERNATIONAL LTD:** *The Catalyst for Sustainable Change.*
 
 Independent analysis of environmental consulting, geospatial intelligence, engineering, and sustainable solutions for environmental management.

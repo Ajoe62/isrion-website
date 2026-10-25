@@ -7,10 +7,11 @@
 // The build fails by name if a `file` has no matching image, so a typo can
 // never ship as a silently broken card.
 //
-// Cards render in pairs (two per row), so keep plates that compare with each
-// other adjacent. A plate marked `feature` takes a full row on its own, with
-// the image beside the text. Every row shares one frame shape, derived from
-// the images themselves, so paired cards always line up.
+// Each series renders as one row card: text on the left, the active plate on
+// the right and a thumbnail strip beneath it to switch plates. Order plates so
+// that ones which compare (e.g. the same pollutant in two years) sit next to
+// each other in the strip. The row's frame takes the shape of the tallest plate
+// in the series, so switching never resizes the card or crops a legend.
 // ---------------------------------------------------------------------------
 
 export type MapWork = {
@@ -25,7 +26,6 @@ export type MapWork = {
   tags: string[];
   accent: string;        // card accent, matched to the map's own ramp
   alt: string;
-  feature?: boolean;     // full-width row, image beside the text
 };
 
 export type MapSeries = {
@@ -33,6 +33,7 @@ export type MapSeries = {
   label: string;         // small label above the series title
   title: string;
   intro: string;
+  period?: string;       // shown in the row's meta list, e.g. "2020–2025"
   plates: MapWork[];
 };
 
@@ -41,6 +42,7 @@ export const mapSeries: MapSeries[] = [
     id: "air-quality",
     label: "Atmospheric pollutants",
     title: "Air quality across Nigeria, mapped.",
+    period: "2020–2025",
     intro:
       "A national atlas of atmospheric pollutants (methane, nitrogen dioxide and fine particulate matter) resolved below state level and paired across years so change is visible at a glance.",
     plates: [
@@ -125,6 +127,7 @@ export const mapSeries: MapSeries[] = [
     id: "kwara-flood",
     label: "Flood hazard · Sentinel-1 SAR",
     title: "Dam-induced flooding in Kwara State, 2018–2025.",
+    period: "2018–2025",
     intro:
       "A multi-temporal radar assessment of five flood events traced to releases from the Jebba and Kainji hydroelectric dams on the River Niger. Flood extents were detected by backscatter change in Google Earth Engine, then overlaid on cropland, population and LGA boundaries to measure what each release put under water.",
     plates: [
@@ -139,7 +142,6 @@ export const mapSeries: MapSeries[] = [
         tags: ["Sentinel-1 GRD", "VV + VH change detection", "Google Earth Engine"],
         accent: "#2a7de1",
         alt: "Dashboard of five bar and line charts comparing flooded area, flooded cropland, population exposed, temporal trend and cropland share for five dam-induced flood events in Kwara State between 2018 and 2025.",
-        feature: true,
       },
       {
         file: "KWARA_FLOOD_2.jpg",
@@ -192,8 +194,6 @@ export const mapSeries: MapSeries[] = [
     ],
   },
 
-  // Pairs are grouped by layout: the two portrait site maps, then the two
-  // landscape flow station maps.
   {
     id: "delta-sampling",
     label: "Field sampling · Delta State",
