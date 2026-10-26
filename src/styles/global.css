@@ -308,6 +308,9 @@ nav.menu a[aria-current="page"]::after{width:100%}
 .proj-card .thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
   transition:transform .7s var(--bezier)}
 .proj-card:hover .thumb img{transform:scale(1.07)}
+.proj-card .thumb[data-fit="contain"]{background:#fff}
+.proj-card .thumb[data-fit="contain"] img{object-fit:contain;padding:2.6rem .8rem .6rem}
+.proj-card .thumb[data-fit="contain"]::after{background:linear-gradient(180deg,rgba(0,17,41,.08),transparent 35%)}
 .proj-card .thumb::after{content:"";position:absolute;inset:0;
   background:linear-gradient(180deg,rgba(0,17,41,.1) 30%,rgba(0,17,41,.6) 100%)}
 .proj-card .chip{position:absolute;left:1rem;top:1rem;z-index:2;font-family:"Space Mono",monospace;font-size:.62rem;
@@ -321,126 +324,99 @@ nav.menu a[aria-current="page"]::after{width:100%}
 .proj-card .tags span{font-family:"Space Mono",monospace;font-size:.6rem;letter-spacing:.08em;color:var(--blue);
   border:1px solid var(--line);border-radius:100px;padding:.3rem .6rem}
 
-/* ---- Map gallery (Our Works) ----------------------------------------------
-   Bold blue band with dark navy cards, matching .svc-card / .value-card / .step.
-   The section above it (.projects-list) is light --tint, so this alternates,
-   and colourful cartography reads far better mounted on dark than on white.
+/* ---- Project pages (/projects/<slug>/) -------------------------------------
+   Overview on light tint, then the gallery on the bold blue band with dark
+   cards: colourful maps and field photos read far better mounted on dark.
    --------------------------------------------------------------------------- */
-.maps-section{padding:var(--pad) 0;background:var(--band);color:#fff}
-.maps-head{max-width:64ch;margin-bottom:clamp(2.2rem,4vw,3.4rem)}
-.maps-head h2{font-size:clamp(1.9rem,1.4rem + 2.4vw,3.2rem);font-weight:500;margin:1.1rem 0 1.1rem;max-width:20ch}
-.maps-head p{color:rgba(255,255,255,.78);font-size:1.05rem}
+.proj-overview{padding:clamp(3.5rem,7vw,6rem) 0;background:var(--tint)}
+.proj-overview-grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:clamp(2rem,5vw,4.5rem);align-items:start}
+.proj-intro p{font-size:clamp(1.05rem,1rem + .3vw,1.2rem);line-height:1.7;color:var(--ink);margin-top:1.2rem;max-width:62ch}
+.proj-intro .tags{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1.5rem}
+.proj-intro .tags span{font-family:"Space Mono",monospace;font-size:.62rem;letter-spacing:.08em;color:var(--blue);
+  border:1px solid var(--line);border-radius:100px;padding:.32rem .7rem;background:rgba(255,255,255,.5)}
+.proj-intro .arrow-link{margin-top:1.8rem}
+.proj-facts{background:var(--band-card);color:#fff;border-radius:var(--r);padding:.4rem 1.6rem;box-shadow:var(--shadow)}
+.proj-facts div{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:1rem 0;
+  border-bottom:1px solid rgba(255,255,255,.12)}
+.proj-facts div:last-child{border-bottom:0}
+.proj-facts dt{font-family:"Space Mono",monospace;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.55)}
+.proj-facts dd{font-weight:600;text-align:right}
+.proj-facts .work-status{margin-top:0}
+.proj-banner{grid-column:1/-1;border-radius:var(--r);overflow:hidden;aspect-ratio:21/9}
+.proj-banner img{width:100%;height:100%;object-fit:cover}
 
-/* Series rows: the same card language as the project rows above (.work-row),
-   text on the left and the active plate on the right. One row per series; the
-   thumbnails under the plate switch between its maps. */
-.map-rows{display:grid;gap:1.6rem}
-.map-row{position:relative;overflow:hidden;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.35fr);
-  gap:clamp(1.6rem,3vw,2.8rem);align-items:start;scroll-margin-top:4.5rem;
-  padding:clamp(1.5rem,2.6vw,2.2rem) clamp(1.5rem,2.6vw,2.2rem) clamp(1.5rem,2.6vw,2.2rem) clamp(1.7rem,3vw,2.6rem);
-  background:var(--band-card);border:1px solid rgba(255,255,255,.16);border-radius:var(--r);
-  transition:border-color .3s,transform .35s var(--bezier),box-shadow .35s}
-.map-row::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(var(--green),var(--azure));
-  transform:scaleY(0);transform-origin:top;transition:transform .45s var(--bezier)}
-.map-row:hover{border-color:rgba(156,196,255,.5);transform:translateY(-3px);box-shadow:0 34px 70px -38px rgba(0,10,30,.85)}
-.map-row:hover::before,.map-row:target::before{transform:scaleY(1)}
-
-.map-row-top{display:flex;align-items:baseline;gap:.9rem}
-.map-row-top .idx{font-family:"Space Grotesk";font-size:3rem;font-weight:700;line-height:1;
-  background:linear-gradient(135deg,var(--azure),var(--green-bright));-webkit-background-clip:text;background-clip:text;color:transparent}
-.map-row-top .cat{font-family:"Space Mono",monospace;font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;color:var(--azure-soft)}
-.map-row-text h3{font-family:"Space Grotesk",sans-serif;font-size:clamp(1.35rem,1.1rem + .9vw,1.75rem);font-weight:600;
-  line-height:1.2;color:#fff;margin-top:1.1rem}
-.map-row-intro{color:rgba(255,255,255,.72);font-size:.95rem;margin-top:.7rem}
-
-/* Captions share one grid cell, so the card holds the height of the longest
-   caption and never jumps when the plate changes. */
-.map-captions{display:grid;margin-top:1.4rem;padding-top:1.4rem;border-top:1px solid rgba(255,255,255,.14)}
-.map-caption{grid-area:1/1;visibility:hidden;opacity:0;transition:opacity .35s,visibility 0s .35s}
-.map-caption.is-active{visibility:visible;opacity:1;transition:opacity .35s}
-.map-caption-head{display:flex;align-items:center;gap:.7rem;margin-bottom:.85rem}
-.map-chip{font-family:"Space Mono",monospace;font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;
-  color:#fff;background:var(--accent,var(--blue));border-radius:100px;padding:.3rem .75rem;flex:none}
-.map-name{font-family:"Space Mono",monospace;font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;
-  color:rgba(255,255,255,.6);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.map-year{margin-left:auto;font-family:"Space Grotesk",sans-serif;font-size:1.05rem;font-weight:600;
-  color:#fff;letter-spacing:.02em;flex:none}
-.map-caption h4{font-family:"Space Grotesk",sans-serif;font-size:1.12rem;font-weight:600;color:#fff;line-height:1.25}
-.map-caption p{color:rgba(255,255,255,.7);font-size:.93rem;margin-top:.6rem}
-.map-spec{display:flex;flex-wrap:wrap;gap:.4rem 1.1rem;margin-top:1.1rem;
-  font-family:"Space Mono",monospace;font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:#fff}
-.map-spec span{position:relative;padding-left:.9rem}
-.map-spec span::before{content:"";position:absolute;left:0;top:50%;transform:translateY(-50%);
-  width:5px;height:5px;border-radius:50%;background:var(--accent,var(--azure))}
-.map-tags{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.9rem}
-.map-tags span{font-family:"Space Mono",monospace;font-size:.6rem;letter-spacing:.08em;color:var(--azure-soft);
-  border:1px solid rgba(255,255,255,.24);border-radius:100px;padding:.3rem .65rem}
-.map-meta{display:flex;flex-wrap:wrap;gap:1rem 2.2rem;margin-top:1.5rem;padding-top:1.2rem;border-top:1px solid rgba(255,255,255,.14)}
-.map-meta dt{font-family:"Space Mono",monospace;font-size:.58rem;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.55)}
-.map-meta dd{font-size:.9rem;font-weight:600;color:#fff;margin-top:.2rem}
-
-/* The plate. contain (not cover): the legend carries the meaning, never crop it.
-   Every plate of a series shares the stage's frame (--frame, set per row). */
-.map-stage{position:relative;aspect-ratio:var(--frame,1.414);background:#fff;border-radius:calc(var(--r) - 4px);overflow:hidden}
-.map-plate{position:absolute;inset:0;display:block;width:100%;height:100%;border:0;padding:0;cursor:zoom-in;
-  background:#fff;font:inherit;color:inherit;animation:map-in .45s var(--bezier)}
-.map-plate[hidden]{display:none}
-.map-plate img{width:100%;height:100%;object-fit:contain}
-@keyframes map-in{from{opacity:0}to{opacity:1}}
-.map-plate::after{content:"";position:absolute;inset:0;pointer-events:none;
-  box-shadow:inset 0 0 0 1px rgba(0,17,41,.08);
-  background:linear-gradient(180deg,transparent 62%,rgba(0,17,41,.16) 100%);
-  opacity:0;transition:opacity .35s}
-.map-plate:hover::after,.map-plate:focus-visible::after{opacity:1}
-.map-expand{position:absolute;right:.9rem;bottom:.9rem;z-index:2;display:inline-flex;align-items:center;gap:.5rem;
-  font-family:"Space Mono",monospace;font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;color:#fff;
+.proj-gallery-sec{padding:var(--pad) 0;background:var(--band);color:#fff}
+.proj-gallery-note{color:rgba(255,255,255,.72);font-size:.95rem}
+.proj-gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.6rem}
+.proj-gallery[data-shape="portrait"]{grid-template-columns:repeat(3,minmax(0,1fr))}
+.proj-plate{display:flex;flex-direction:column;background:var(--band-card);border:1px solid rgba(255,255,255,.14);
+  border-radius:var(--r);overflow:hidden;transition:border-color .35s,transform .35s var(--bezier),box-shadow .35s}
+.proj-plate:hover{transform:translateY(-4px);border-color:rgba(255,255,255,.34);box-shadow:0 34px 70px -38px rgba(0,10,30,.85)}
+/* contain (not cover) for maps: the legend carries the meaning, never crop it */
+.proj-plate-img{position:relative;display:block;width:100%;aspect-ratio:var(--frame,1.414);border:0;padding:0;
+  background:#fff;cursor:zoom-in;overflow:hidden;font:inherit;color:inherit}
+.proj-plate-img img{width:100%;height:100%;object-fit:contain}
+.proj-plate-img[data-fit="cover"] img{object-fit:cover;transition:transform .7s var(--bezier)}
+.proj-plate:hover .proj-plate-img[data-fit="cover"] img{transform:scale(1.04)}
+.proj-plate-img:focus-visible{outline:2px solid var(--azure);outline-offset:-2px}
+.proj-expand{position:absolute;right:.9rem;bottom:.9rem;z-index:2;display:inline-flex;align-items:center;gap:.5rem;
+  font-family:"Space Mono",monospace;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:#fff;
   background:rgba(0,17,41,.78);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.28);
   border-radius:100px;padding:.45rem .85rem;
   opacity:0;transform:translateY(6px);transition:opacity .3s,transform .35s var(--bezier)}
-.map-expand svg{width:13px;height:13px}
-.map-row:hover .map-expand,.map-plate:focus-visible .map-expand{opacity:1;transform:none}
-.map-plate:focus-visible{outline:2px solid var(--azure);outline-offset:-2px}
+.proj-expand svg{width:13px;height:13px}
+.proj-plate:hover .proj-expand,.proj-plate-img:focus-visible .proj-expand{opacity:1;transform:none}
+.proj-plate figcaption{display:flex;flex-direction:column;flex:1;padding:1.3rem 1.4rem 1.5rem}
+.plate-head{display:flex;align-items:center;gap:.7rem;margin-bottom:.8rem}
+.plate-chip{font-family:"Space Mono",monospace;font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;
+  color:#fff;background:var(--accent,var(--blue));border-radius:100px;padding:.3rem .75rem;flex:none}
+.plate-name{font-family:"Space Mono",monospace;font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;
+  color:rgba(255,255,255,.6);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.plate-year{margin-left:auto;font-family:"Space Grotesk",sans-serif;font-size:1rem;font-weight:600;color:#fff;flex:none}
+.proj-plate h3{font-family:"Space Grotesk",sans-serif;font-size:1.08rem;font-weight:600;line-height:1.25;color:#fff}
+.proj-plate p{color:rgba(255,255,255,.72);font-size:.92rem;margin-top:.55rem}
+.plate-stat{display:flex;align-items:center;gap:.55rem;margin-top:auto;padding-top:1rem;
+  font-family:"Space Mono",monospace;font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:#fff}
+.plate-stat::before{content:"";flex:none;width:5px;height:5px;border-radius:50%;background:var(--accent,var(--green-bright))}
+.plate-tags{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.8rem}
+.plate-tags span{font-family:"Space Mono",monospace;font-size:.58rem;letter-spacing:.08em;color:var(--azure-soft);
+  border:1px solid rgba(255,255,255,.22);border-radius:100px;padding:.28rem .62rem}
 
-/* Thumbnail strip: one column per plate (--n), so each series fills one line. */
-.map-thumbs{display:grid;grid-template-columns:repeat(var(--n,4),minmax(0,1fr));gap:.65rem;margin-top:.85rem}
-.map-thumb{display:flex;flex-direction:column;gap:.45rem;min-width:0;padding:0;border:0;background:none;
-  cursor:pointer;font:inherit;text-align:left;color:rgba(255,255,255,.55);transition:color .25s}
-.map-thumb img{width:100%;height:auto;aspect-ratio:4/3;object-fit:contain;background:#fff;border-radius:8px;opacity:.5;
-  outline:2px solid transparent;outline-offset:2px;transition:opacity .25s,outline-color .25s}
-.map-thumb span{font-family:"Space Mono",monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.map-thumb span b{font-weight:400;color:#fff}
-.map-thumb:hover{color:rgba(255,255,255,.85)}
-.map-thumb:hover img{opacity:.85}
-.map-thumb[aria-selected="true"]{color:#fff}
-.map-thumb[aria-selected="true"] img{opacity:1;outline-color:var(--accent,var(--azure))}
-.map-thumb:focus-visible{outline:none}
-.map-thumb:focus-visible img{outline-color:var(--azure-soft)}
+.proj-pager{background:var(--mist);border-top:1px solid var(--line)}
+.proj-pager .wrap{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:1.5rem;padding:2.2rem 0}
+.proj-pager .prev,.proj-pager .next{display:flex;flex-direction:column;gap:.35rem;color:var(--navy)}
+.proj-pager .next{text-align:right}
+.proj-pager span{font-family:"Space Mono",monospace;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.proj-pager b{font-family:"Space Grotesk",sans-serif;font-size:1.05rem;font-weight:600;transition:color .25s}
+.proj-pager a:hover b{color:var(--blue)}
+.proj-pager .all{font-family:"Space Mono",monospace;font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--navy);border:1px solid var(--line);border-radius:100px;padding:.65rem 1.2rem;transition:border-color .25s}
+.proj-pager .all:hover{border-color:var(--navy)}
 
-/* ---- Map lightbox ---- */
-.map-lightbox{width:min(1400px,94vw);max-width:none;max-height:92vh;padding:0;border:0;border-radius:var(--r);
+/* ---- Image viewer (ProjectLightbox) ---- */
+.lightbox{width:min(1400px,94vw);max-width:none;max-height:92vh;padding:0;border:0;border-radius:var(--r);
   background:var(--navy-950);color:#fff;overflow:hidden;box-shadow:0 50px 120px -40px rgba(0,0,0,.8)}
-.map-lightbox::backdrop{background:rgba(0,11,26,.82);backdrop-filter:blur(6px)}
-.map-lightbox figure{display:flex;flex-direction:column;max-height:92vh}
-.ml-stage{position:relative;flex:1;min-height:min(40vh,360px);display:flex;background:#fff}
-.map-lightbox img{width:100%;min-height:0;object-fit:contain;background:#fff}
-.map-lightbox figcaption{padding:1.3rem clamp(1.2rem,3vw,2rem);border-top:1px solid var(--line-dark);flex:none}
-.map-lightbox figcaption h3{font-family:"Space Grotesk",sans-serif;font-size:1.15rem;font-weight:600;color:#fff}
-.map-lightbox figcaption p{color:rgba(255,255,255,.72);font-size:.92rem;margin-top:.5rem;max-width:90ch}
-.ml-range,.ml-count{display:inline-block;margin-top:.8rem;font-family:"Space Mono",monospace;font-size:.68rem;
+.lightbox::backdrop{background:rgba(0,11,26,.82);backdrop-filter:blur(6px)}
+.lightbox figure{display:flex;flex-direction:column;max-height:92vh}
+.lb-stage{position:relative;flex:1;min-height:min(40vh,360px);display:flex;background:#fff}
+.lightbox img{width:100%;min-height:0;object-fit:contain;background:#fff}
+.lightbox figcaption{padding:1.3rem clamp(1.2rem,3vw,2rem);border-top:1px solid var(--line-dark);flex:none}
+.lightbox figcaption h3{font-family:"Space Grotesk",sans-serif;font-size:1.15rem;font-weight:600;color:#fff}
+.lightbox figcaption p{color:rgba(255,255,255,.72);font-size:.92rem;margin-top:.5rem;max-width:90ch}
+.lb-range,.lb-count{display:inline-block;margin-top:.8rem;font-family:"Space Mono",monospace;font-size:.68rem;
   letter-spacing:.12em;text-transform:uppercase;color:var(--azure)}
-.ml-count{margin-left:1.4rem;color:rgba(255,255,255,.55)}
-.ml-close,.ml-nav{position:absolute;z-index:3;width:44px;height:44px;display:grid;place-items:center;
+.lb-count{margin-left:1.4rem;color:rgba(255,255,255,.55)}
+.lb-close,.lb-nav{position:absolute;z-index:3;width:44px;height:44px;display:grid;place-items:center;
   border-radius:50%;cursor:pointer;color:#fff;background:rgba(0,17,41,.7);backdrop-filter:blur(6px);
   border:1px solid rgba(255,255,255,.28);transition:background .3s,transform .3s var(--bezier)}
-.ml-close{top:.9rem;right:.9rem}
-.ml-nav{top:50%;transform:translateY(-50%)}
-.ml-nav[hidden]{display:none}
-.ml-prev{left:.9rem}
-.ml-next{right:.9rem}
-.ml-close svg,.ml-nav svg{width:18px;height:18px}
-.ml-close:hover{background:var(--blue);transform:rotate(90deg)}
-.ml-nav:hover{background:var(--blue)}
+.lb-close{top:.9rem;right:.9rem}
+.lb-nav{top:50%;transform:translateY(-50%)}
+.lb-nav[hidden]{display:none}
+.lb-prev{left:.9rem}
+.lb-next{right:.9rem}
+.lb-close svg,.lb-nav svg{width:18px;height:18px}
+.lb-close:hover{background:var(--blue);transform:rotate(90deg)}
+.lb-nav:hover{background:var(--blue)}
 
 /* ===========================================================================
    NEWS (blog) AND EVENTS
@@ -817,6 +793,29 @@ nav.menu a[aria-current="page"]::after{width:100%}
 .work-thumb[data-sector="Engineering"]{background:linear-gradient(135deg,#001f4d,#0b5cc4)}
 .work-thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .7s var(--bezier)}
 .work-row:hover .work-thumb img{transform:scale(1.06)}
+.work-thumb[data-sector="Environmental"]{background:linear-gradient(135deg,#1f9d57,#0b5cc4)}
+/* maps sit whole on a white mount; photos fill the frame */
+.work-thumb[data-fit="contain"]{background:#fff;box-shadow:inset 0 0 0 1px var(--line)}
+.work-thumb[data-fit="contain"] img{object-fit:contain;padding:.4rem}
+.work-count{position:absolute;right:.6rem;bottom:.6rem;z-index:1;font-family:"Space Mono",monospace;font-size:.56rem;
+  letter-spacing:.14em;text-transform:uppercase;color:#fff;background:rgba(0,17,41,.74);backdrop-filter:blur(6px);
+  border-radius:100px;padding:.3rem .6rem}
+/* The title link is stretched over the whole card, so the card is one target. */
+.work-link{color:inherit}
+.work-link::after{content:"";position:absolute;inset:0;z-index:2}
+.work-link:focus-visible{outline:none}
+.work-row:has(.work-link:focus-visible){outline:2px solid var(--azure);outline-offset:3px}
+.work-more{display:inline-flex;align-items:center;gap:.55rem;margin-top:1.3rem;font-family:"Space Mono",monospace;
+  font-size:.66rem;letter-spacing:.18em;text-transform:uppercase;color:var(--blue);transition:gap .3s var(--bezier)}
+.work-more svg{width:14px;height:14px}
+.work-row:hover .work-more{gap:.9rem}
+.work-row:nth-child(odd) .work-more{color:var(--azure-soft)}
+.work-status{display:inline-flex;align-items:center;gap:.45rem;width:fit-content;margin-top:.55rem;
+  font-family:"Space Mono",monospace;font-size:.58rem;letter-spacing:.16em;text-transform:uppercase;color:var(--green);
+  background:rgba(62,203,124,.14);border:1px solid rgba(62,203,124,.5);border-radius:100px;padding:.28rem .65rem}
+.work-status::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--green-bright);animation:pulse 2s infinite}
+.work-row:nth-child(odd) .work-status,.proj-facts .work-status{color:#fff}
+.works-done{background:var(--mist)}
 @media(max-width:1080px){.work-row{grid-template-columns:170px 1fr 240px}}
 @media(max-width:900px){
   .work-row{grid-template-columns:1fr 1fr;align-items:start}
@@ -1004,9 +1003,9 @@ nav.menu a[aria-current="page"]::after{width:100%}
   /* multi-page layouts collapse to single/two columns */
   .home-intro .grid,.prose .grid,.contact-grid{grid-template-columns:1fr;gap:2.4rem}
   .svc-grid,.proj-grid,.values-grid{grid-template-columns:1fr 1fr}
-  /* map rows stack with the plate on top, as the project rows do */
-  .map-row{grid-template-columns:minmax(0,1fr)}
-  .map-row-viewer{grid-row:1}
+  .proj-overview-grid{grid-template-columns:1fr}
+  .proj-gallery{grid-template-columns:1fr}
+  .proj-gallery[data-shape="portrait"]{grid-template-columns:1fr 1fr}
   .res-grid{grid-template-columns:1fr}
   .post-grid{grid-template-columns:1fr 1fr}
   .post-feature,.ev-feature{grid-template-columns:1fr}
@@ -1046,16 +1045,15 @@ nav.menu a[aria-current="page"]::after{width:100%}
   .map-section iframe{height:320px}
   .bento{grid-template-columns:1fr}
   /* lightbox goes near-fullscreen; caption scrolls under the plate */
-  .map-lightbox{width:100vw;max-height:100dvh;border-radius:0}
-  .map-lightbox figure{max-height:100dvh;overflow-y:auto}
-  .ml-stage{flex:none}
-  .map-row-top .idx{font-size:2.2rem}
-  /* thumbnails become a swipeable strip */
-  .map-thumbs{display:flex;overflow-x:auto;scrollbar-width:none;padding:3px;margin:.85rem -3px 0}
-  .map-thumbs::-webkit-scrollbar{display:none}
-  .map-thumb{flex:0 0 92px}
+  .lightbox{width:100vw;max-height:100dvh;border-radius:0}
+  .lightbox figure{max-height:100dvh;overflow-y:auto}
+  .lb-stage{flex:none}
+  .proj-gallery[data-shape="portrait"]{grid-template-columns:1fr}
+  .proj-banner{aspect-ratio:16/10}
+  .proj-pager .wrap{grid-template-columns:1fr 1fr}
+  .proj-pager .all{grid-column:1/-1;grid-row:1;justify-self:center}
   /* no hover on touch: keep the expand affordance permanently visible */
-  .map-expand{opacity:1;transform:none}
+  .proj-expand{opacity:1;transform:none}
   .post-grid,.post-grid[data-items="2"]{grid-template-columns:1fr}
   .post-grid[data-items="1"] .post-card{display:flex}
   .post-grid[data-items="1"] .post-thumb{min-height:0;height:220px}

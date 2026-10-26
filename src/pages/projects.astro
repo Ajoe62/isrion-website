@@ -1,71 +1,59 @@
 ---
-// Our Works mirrors the Services page: hero, a numbered list, a secondary
-// section (the map gallery) and a CTA. The index bar under the hero is built
-// from the same data, so new projects and map series appear in it automatically.
+// Our Works: hero, an index bar, then two lists of project rows (ongoing, then
+// completed) and a CTA. Every row opens the project's own page with its full
+// gallery. Everything is built from src/data/projects.ts, so a new project
+// appears here, in the index bar and on its own page automatically.
 import BaseLayout from "../layouts/BaseLayout.astro";
 import PageHero from "../components/PageHero.astro";
-import MapGallery from "../components/MapGallery.astro";
-import { company, projects } from "../data/site";
-import { mapSeries } from "../data/maps";
-
-const pad = (n: number) => String(n + 1).padStart(2, "0");
-// "Flood hazard · Sentinel-1 SAR" reads as "Flood hazard" in the index bar.
-const shortLabel = (label: string) => label.split(" · ")[0];
+import ProjectCard from "../components/ProjectCard.astro";
+import { company } from "../data/site";
+import { ongoing, completed } from "../data/projects";
 ---
-<BaseLayout title={`Our Works | ${company.name}`}>
+<BaseLayout
+  title={`Our Works | ${company.name}`}
+  description="Ongoing and completed environmental and geospatial projects by ISRION International Ltd, from national air quality mapping to community groundwater assessment."
+>
   <PageHero
     current="Our Works"
     eyebrow="Projects"
     title="Work that holds up over the long term."
-    subtitle="A selection of engagements across environmental, geospatial, energy and engineering domains. Representative examples; get in touch for sector-specific references."
+    subtitle="Field studies and spatial analyses from our environmental and geospatial practice, from national pollution mapping and satellite flood assessment to community groundwater monitoring."
     image="/img/projects-hero.jpg"
   />
 
   <!-- IN-PAGE INDEX -->
   <nav class="page-index" aria-label="On this page">
     <div class="wrap">
-      <a href="#projects"><span class="n">{projects.length}</span>Projects</a>
-      <span class="sep" aria-hidden="true"></span>
-      <span class="page-index-label">Cartography</span>
-      {mapSeries.map((s) => (
-        <a href={`#${s.id}`}><span class="n">{s.plates.length}</span>{shortLabel(s.label)}</a>
-      ))}
+      {ongoing.length > 0 && <a href="#ongoing"><span class="n">{ongoing.length}</span>Ongoing</a>}
+      <a href="#completed"><span class="n">{completed.length}</span>Worked on</a>
     </div>
   </nav>
 
-  <!-- PROJECT LIST -->
-  <section class="services-list works-list" id="projects"><div class="wrap">
+  {ongoing.length > 0 && (
+    <section class="services-list works-list" id="ongoing"><div class="wrap">
+      <div class="sec-head">
+        <div>
+          <span class="eyebrow" data-reveal>In progress</span>
+          <h2 data-reveal>Ongoing projects.</h2>
+        </div>
+      </div>
+      <div class="svc-rows">
+        {ongoing.map((p, i) => <ProjectCard project={p} index={i} />)}
+      </div>
+    </div></section>
+  )}
+
+  <section class="services-list works-list works-done" id="completed"><div class="wrap">
     <div class="sec-head">
       <div>
-        <span class="eyebrow" data-reveal>Selected projects</span>
-        <h2 data-reveal>Engagements, start to finish.</h2>
+        <span class="eyebrow" data-reveal>Completed</span>
+        <h2 data-reveal>Projects we've worked on.</h2>
       </div>
     </div>
     <div class="svc-rows">
-      {projects.map((p, i) => (
-        <article class="svc-row work-row" data-reveal>
-          <div class="svc-row-idx">
-            <span class="idx">{pad(i)}</span>
-            <span class="cat">{p.sector}</span>
-            <dl class="work-meta">
-              <div><dt>Year</dt><dd>{p.year}</dd></div>
-              <div><dt>Location</dt><dd>{p.location}</dd></div>
-            </dl>
-          </div>
-          <div class="svc-row-body">
-            <h3>{p.title}</h3>
-            <p>{p.summary}</p>
-            <div class="tags">{p.tags.map((t) => <span>{t}</span>)}</div>
-          </div>
-          <div class="work-thumb" data-sector={p.sector}>
-            {p.image && <img src={p.image} alt="" loading="lazy" />}
-          </div>
-        </article>
-      ))}
+      {completed.map((p, i) => <ProjectCard project={p} index={i} />)}
     </div>
   </div></section>
-
-  <MapGallery />
 
   <!-- CTA -->
   <section class="home-cta"><div class="wrap">

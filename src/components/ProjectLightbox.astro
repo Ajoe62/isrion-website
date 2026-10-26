@@ -1,0 +1,104 @@
+---
+// Full-size image viewer for project pages. Any element with `data-lb-open`
+// opens it; prev/next step through the other openers in the same
+// `[data-gallery]`. Native <dialog> gives a real focus trap + Esc for free.
+---
+<dialog class="lightbox" aria-label="Image viewer">
+  <button class="lb-close" type="button" data-lb-close aria-label="Close image viewer">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <path d="M6 6l12 12M18 6L6 18"/>
+    </svg>
+  </button>
+  <figure>
+    <div class="lb-stage">
+      <img alt="" />
+      <button class="lb-nav lb-prev" type="button" data-lb-step="-1" aria-label="Previous image">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+             stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <button class="lb-nav lb-next" type="button" data-lb-step="1" aria-label="Next image">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+             stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+    </div>
+    <figcaption>
+      <h3></h3>
+      <p></p>
+      <span class="lb-range"></span>
+      <span class="lb-count"></span>
+    </figcaption>
+  </figure>
+</dialog>
+
+<script>
+  // Delegated on `document` and registered once: the listeners outlive
+  // ClientRouter view transitions, and the gallery and dialog are re-queried
+  // per event so they always target the current page's markup.
+  declare global { interface Window { __lenis?: { stop(): void; start(): void } } }
+
+  if (!(window as any).__lightboxBound) {
+    (window as any).__lightboxBound = true;
+
+    const dlg = () => document.querySelector<HTMLDialogElement>(".lightbox");
+    // The opener list the viewer is browsing, and where it is in it.
+    let list: HTMLElement[] = [];
+    let at = 0;
+
+    const show = (i: number) => {
+      const d = dlg();
+      if (!d || !list.length) return;
+      const n = list.length;
+      at = (i + n) % n;
+      const opener = list[at];
+
+      const img = d.querySelector("img")!;
+      img.src = opener.dataset.full || "";
+      img.alt = opener.querySelector("img")?.alt || "";
+      d.querySelector("figcaption h3")!.textContent = opener.dataset.title || "";
+      d.querySelector("figcaption p")!.textContent = opener.dataset.desc || "";
+      d.querySelector(".lb-range")!.textContent = opener.dataset.range || "";
+      d.querySelector(".lb-count")!.textContent = n > 1 ? `${at + 1} / ${n}` : "";
+      d.querySelectorAll<HTMLElement>(".lb-nav").forEach((b) => (b.hidden = n < 2));
+
+      if (!d.open) {
+        d.showModal();
+        // Pause Lenis so the page doesn't drift behind the overlay; the
+        // overflow lock covers the reduced-motion case where Lenis is absent.
+        window.__lenis?.stop();
+        document.documentElement.style.overflow = "hidden";
+      }
+    };
+
+    document.addEventListener("click", (e) => {
+      const target = e.target as HTMLElement;
+
+      const opener = target.closest<HTMLElement>("[data-lb-open]");
+      if (opener) {
+        const scope = opener.closest("[data-gallery]") ?? document;
+        list = [...scope.querySelectorAll<HTMLElement>("[data-lb-open]")];
+        return show(list.indexOf(opener));
+      }
+
+      const nav = target.closest<HTMLElement>("[data-lb-step]");
+      if (nav) return show(at + Number(nav.dataset.lbStep));
+
+      // Close button, or a click on the backdrop (target is the dialog itself).
+      if (target.closest("[data-lb-close]") || target.classList.contains("lightbox")) dlg()?.close();
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (!dlg()?.open) return;
+      if (e.key === "ArrowLeft") show(at - 1);
+      if (e.key === "ArrowRight") show(at + 1);
+    });
+
+    document.addEventListener("close", (e) => {
+      if (!(e.target as HTMLElement)?.classList?.contains("lightbox")) return;
+      window.__lenis?.start();
+      document.documentElement.style.overflow = "";
+      list = [];
+      const img = (e.target as HTMLDialogElement).querySelector("img");
+      if (img) img.src = ""; // release the 2000px decode
+    }, true);
+  }
+</script>

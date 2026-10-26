@@ -1,0 +1,51 @@
+---
+// One project row on /projects. Same markup and classes as the Services rows
+// (.svc-row), so size, styling and the dark/white alternation come for free.
+// The title link is stretched over the whole card, so the card is one click
+// target while screen readers still hear a single, named link.
+import { Image } from "astro:assets";
+import type { Project } from "../data/projects";
+import { coverImage, imageCount } from "../lib/project-images";
+
+interface Props {
+  project: Project;
+  index: number;
+}
+const { project: p, index } = Astro.props;
+const cover = coverImage(p);
+---
+<article class="svc-row work-row" data-reveal>
+  <div class="svc-row-idx">
+    <span class="idx">{String(index + 1).padStart(2, "0")}</span>
+    <span class="cat">{p.sector}</span>
+    {p.status === "ongoing" && <span class="work-status">Ongoing</span>}
+    <dl class="work-meta">
+      {p.year && <div><dt>Year</dt><dd>{p.year}</dd></div>}
+      <div><dt>Location</dt><dd>{p.location}</dd></div>
+    </dl>
+  </div>
+  <div class="svc-row-body">
+    <h3><a class="work-link" href={`/projects/${p.slug}/`}>{p.title}</a></h3>
+    <p>{p.summary}</p>
+    <div class="tags">{p.tags.map((t) => <span>{t}</span>)}</div>
+    <span class="work-more" aria-hidden="true">View project
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </span>
+  </div>
+  <div class="work-thumb" data-sector={p.sector} data-fit={p.fit}>
+    {typeof cover === "string" && <img src={cover} alt="" loading="lazy" />}
+    {cover && typeof cover !== "string" && (
+      <Image
+        src={cover}
+        alt=""
+        width={600}
+        widths={[320, 600]}
+        sizes="(max-width:900px) 92vw, 300px"
+        format="webp"
+        quality={72}
+        loading="lazy"
+      />
+    )}
+    {p.plates.length > 0 && <span class="work-count">{imageCount(p)}</span>}
+  </div>
+</article>

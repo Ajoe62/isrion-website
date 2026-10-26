@@ -1,0 +1,161 @@
+---
+// One page per project in src/data/projects.ts, served at /projects/<slug>/.
+// Overview and key facts first, then every image in the project as a captioned
+// gallery; any image opens full size, and the viewer steps through the rest.
+import { Image, getImage } from "astro:assets";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageHero from "../../components/PageHero.astro";
+import ProjectLightbox from "../../components/ProjectLightbox.astro";
+import { company } from "../../data/site";
+import { projects } from "../../data/projects";
+import { plateImage } from "../../lib/project-images";
+import { getPosts } from "../../lib/content";
+
+export async function getStaticPaths() {
+  return projects.map((p, i) => ({ params: { slug: p.slug }, props: { i } }));
+}
+
+const { i } = Astro.props as { i: number };
+const p = projects[i];
+const n = projects.length;
+const prev = projects[(i - 1 + n) % n];
+const next = projects[(i + 1) % n];
+const plain = (t: string) => t.replace(/\.$/, "");
+const statusLabel = p.status === "ongoing" ? "Ongoing" : "Completed";
+
+const plates = await Promise.all(
+  p.plates.map(async (m) => {
+    const src = plateImage(m);
+    // Larger render for the viewer, where the reader is inspecting detail.
+    // sharp never enlarges, so smaller exports simply keep their own width.
+    const full = await getImage({ src, width: 2000, format: "webp", quality: 62 });
+    return { ...m, src, full: full.src, ratio: src.width / src.height };
+  }),
+);
+// Every plate shares one frame, shaped by the tallest image, so the gallery
+// lines up and no map is cropped. Portrait sets (field photos) go three across.
+const frame = plates.length ? Math.min(...plates.map((m) => m.ratio)) : 1;
+const shape = frame < 1 ? "portrait" : "landscape";
+
+// Link the write-up only if it is actually published.
+const news = p.newsSlug ? (await getPosts()).find((x) => x.id === p.newsSlug) : undefined;
+
+const url = new URL(Astro.url.pathname, Astro.site ?? company.url).href;
+const coverPlate = plates[p.cover ?? 0];
+const ogImage = coverPlate
+  ? new URL((await getImage({ src: coverPlate.src, width: 1200, format: "jpg" })).src, url).href
+  : p.image && new URL(p.image, url).href;
+---
+<BaseLayout title={`${plain(p.title)} | ${company.name}`} description={p.summary} image={ogImage}>
+  <PageHero
+    parent={{ label: "Our Works", href: "/projects" }}
+    current={plain(p.title)}
+    eyebrow={`${statusLabel} · ${p.sector}`}
+    title={p.title}
+    subtitle={p.fullTitle ?? p.summary}
+    image="/img/projects-hero.jpg"
+  />
+
+  <section class="proj-overview"><div class="wrap proj-overview-grid">
+    <div class="proj-intro" data-reveal>
+      <span class="eyebrow">{p.label}</span>
+      <p>{p.intro}</p>
+      <div class="tags">{p.tags.map((t) => <span>{t}</span>)}</div>
+      {news && (
+        <a class="arrow-link" href={`/news/${news.id}/`}>Read the write-up
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      )}
+    </div>
+    <dl class="proj-facts" data-reveal>
+      <div><dt>Status</dt><dd>{p.status === "ongoing" ? <span class="work-status">Ongoing</span> : "Completed"}</dd></div>
+      <div><dt>Sector</dt><dd>{p.sector}</dd></div>
+      {p.year && <div><dt>Year</dt><dd>{p.year}</dd></div>}
+      <div><dt>Location</dt><dd>{p.location}</dd></div>
+      {plates.length > 0 && <div><dt>Images</dt><dd>{plates.length}</dd></div>}
+    </dl>
+    {!plates.length && p.image && (
+      <figure class="proj-banner" data-reveal><img src={p.image} alt="" loading="lazy" /></figure>
+    )}
+  </div></section>
+
+  {plates.length > 0 && (
+    <section class="proj-gallery-sec"><div class="wrap">
+      <div class="sec-head">
+        <div>
+          <span class="eyebrow on-dark" data-reveal>Gallery</span>
+          <h2 data-reveal>{p.fit === "cover" ? "From the field." : "The maps and figures."}</h2>
+        </div>
+        <p class="proj-gallery-note" data-reveal>Select any image to view it full size.</p>
+      </div>
+      <div class="proj-gallery" data-gallery data-shape={shape} style={`--frame:${frame.toFixed(4)}`}>
+        {plates.map((m) => (
+          <figure class="proj-plate" data-reveal style={m.accent ? `--accent:${m.accent}` : undefined}>
+            <button
+              class="proj-plate-img"
+              type="button"
+              data-fit={p.fit}
+              data-lb-open
+              data-full={m.full}
+              data-title={m.year ? `${m.title} (${m.year})` : m.title}
+              data-desc={m.description}
+              data-range={m.stat}
+              aria-label={`View ${m.title}${m.year ? ` (${m.year})` : ""} full size`}
+            >
+              <Image
+                src={m.src}
+                alt={m.alt}
+                width={shape === "portrait" ? 640 : 1100}
+                widths={shape === "portrait" ? [420, 640] : [640, 900, 1100]}
+                sizes={shape === "portrait"
+                  ? "(max-width:640px) 92vw, (max-width:900px) 46vw, 380px"
+                  : "(max-width:900px) 92vw, 590px"}
+                format="webp"
+                quality={78}
+                loading="lazy"
+              />
+              <span class="proj-expand" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
+                </svg>
+                Full size
+              </span>
+            </button>
+            <figcaption>
+              {(m.chip || m.year) && (
+                <div class="plate-head">
+                  {m.chip && <span class="plate-chip">{m.chip}</span>}
+                  {m.label && <span class="plate-name">{m.label}</span>}
+                  {m.year && <span class="plate-year">{m.year}</span>}
+                </div>
+              )}
+              <h3>{m.title}</h3>
+              {m.description && <p>{m.description}</p>}
+              {m.stat && <span class="plate-stat">{m.stat}</span>}
+              {m.tags && <div class="plate-tags">{m.tags.map((t) => <span>{t}</span>)}</div>}
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+    </div></section>
+  )}
+
+  <nav class="proj-pager" aria-label="More projects"><div class="wrap">
+    <a href={`/projects/${prev.slug}/`} class="prev">
+      <span>Previous project</span><b>{plain(prev.title)}</b>
+    </a>
+    <a href="/projects" class="all">All projects</a>
+    <a href={`/projects/${next.slug}/`} class="next">
+      <span>Next project</span><b>{plain(next.title)}</b>
+    </a>
+  </div></nav>
+
+  <section class="home-cta"><div class="wrap">
+    <h2 data-reveal>Want to discuss a similar project?</h2>
+    <p data-reveal>We'll share relevant experience and outline how we'd approach your work.</p>
+    <a href="/contact" class="btn btn-primary" data-reveal>Contact us
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+  </div></section>
+
+  {plates.length > 0 && <ProjectLightbox />}
+</BaseLayout>
